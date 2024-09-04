@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+
 import '../../data/models/recipe.dart';
 import '../../providers.dart';
 import '../recipes/recipe_details.dart';
@@ -15,7 +16,7 @@ class Bookmarks extends ConsumerStatefulWidget {
 }
 
 class _BookmarkState extends ConsumerState<Bookmarks> {
-   List<Recipe> recipes = [];
+  List<Recipe> recipes = [];
 
   @override
   Widget build(BuildContext context) {
@@ -23,8 +24,15 @@ class _BookmarkState extends ConsumerState<Bookmarks> {
   }
 
   Widget _buildBookmarks(BuildContext context) {
+    // This watches the repository for changes and updates the widget
     final repository = ref.watch(repositoryProvider);
     recipes = repository.currentRecipes;
+
+    /// Delete Recipe
+    void deleteRecipe(Recipe recipe) {
+      ref.read(repositoryProvider.notifier).deleteRecipe(recipe);
+    }
+
     return SliverLayoutBuilder(
       builder: (BuildContext context, SliverConstraints constraints) {
         return SliverList.builder(
@@ -66,7 +74,7 @@ class _BookmarkState extends ConsumerState<Bookmarks> {
                 ),
                 child: GestureDetector(
                   onTap: () {
-                    // TODO: Add Push to Recipe Details Page
+                    /// Push to Recipe Details Page
                     Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -106,10 +114,5 @@ class _BookmarkState extends ConsumerState<Bookmarks> {
       },
     );
     // TODO: Add else here
-  }
-
- 
-  void deleteRecipe(Recipe recipe) {
-    ref.read(repositoryProvider.notifier).deleteRecipe(recipe);
   }
 }

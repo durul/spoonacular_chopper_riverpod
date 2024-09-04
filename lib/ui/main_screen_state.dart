@@ -3,7 +3,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'main_screen_state.freezed.dart';
 
-// 1
+// it provides the current selected index of the bottom navigation bar.
 @freezed
 class MainScreenState with _$MainScreenState {
   const factory MainScreenState({
@@ -11,11 +11,11 @@ class MainScreenState with _$MainScreenState {
   }) = _MainScreenState;
 }
 
-// 2
+// It provides the current state of the MainScreen widget.
 class MainScreenStateProvider extends StateNotifier<MainScreenState> {
   MainScreenStateProvider() : super(const MainScreenState());
 
-  // 3
+  // It provides to updated the index.
   void updateSelectedIndex(int index) {
     state = MainScreenState(selectedIndex: index);
   }

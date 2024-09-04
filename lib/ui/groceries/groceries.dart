@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/models/ingredient.dart';
+import '../../providers.dart';
 import '../theme/colors.dart';
 import '../widgets/common.dart';
 import '../widgets/ingredient_card.dart';
-import '../../providers.dart';
 
 class GroceryList extends ConsumerStatefulWidget {
   const GroceryList({Key? key}) : super(key: key);
@@ -73,6 +73,7 @@ class _GroceryListState extends ConsumerState<GroceryList> {
     );
   }
 
+  /// This method builds the list of ingredients that are needed and have
   Widget buildNeedHaveList() {
     final repository = ref.watch(repositoryProvider);
     currentIngredients = repository.currentIngredients;
@@ -119,8 +120,7 @@ class _GroceryListState extends ConsumerState<GroceryList> {
       startSearch(searchTextController.text);
       return ingredientList(searchIngredients, checkBoxValues, true);
     } else {
-      return ingredientList(
-        currentIngredients, checkBoxValues, true);
+      return ingredientList(currentIngredients, checkBoxValues, true);
     }
   }
 

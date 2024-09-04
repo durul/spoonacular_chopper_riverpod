@@ -17,9 +17,9 @@ class RecipeDetails extends ConsumerStatefulWidget {
   final Recipe recipe;
 
   const RecipeDetails({
-    Key? key,
+    super.key,
     required this.recipe,
-  }) : super(key: key);
+  });
 
   @override
   ConsumerState<RecipeDetails> createState() => _RecipeDetailsState();
@@ -126,6 +126,9 @@ class _RecipeDetailsState extends ConsumerState<RecipeDetails> {
   }
 
   Widget titleRow() {
+    /// Add Repository to the read method
+    /// This reads the repositoryProvider as a class instance than
+    /// I can use it to access the functions in the repository.
     final repository = ref.read(repositoryProvider.notifier);
     final titleRowColor =
         widget.recipe.bookmarked ? Colors.black : Colors.white;
