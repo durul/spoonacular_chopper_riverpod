@@ -1,11 +1,16 @@
 import 'dart:convert';
+
 import 'package:chopper/chopper.dart';
-import 'query_result.dart';
 
 import 'model_response.dart';
+import 'query_result.dart';
 import 'spoonacular_model.dart';
 
+// To use the returned API data, I need a converter to transform
+// requests and responses. To attach a converter to a Chopper client,
+// I need an interceptor.
 class SpoonacularConverter implements Converter {
+  /// Takes a request and adds the necessary headers
   @override
   Request convertRequest(Request request) {
     final req = applyHeader(
@@ -18,6 +23,9 @@ class SpoonacularConverter implements Converter {
     return encodeJson(req);
   }
 
+  /// To make it easy to expand my app in the future,
+  /// I’ll separate encoding and decoding logic.
+  /// This method takes a request and encodes the body to JSON.
   Request encodeJson(Request request) {
     final contentType = request.headers[contentTypeKey];
     if (contentType != null && contentType.contains(jsonHeaders)) {
@@ -26,7 +34,7 @@ class SpoonacularConverter implements Converter {
     return request;
   }
 
-  /// Take the JSON data and convert to models
+  /// Parse the JSON data and transform it into the APIRecipeQuery model class.
   Response<BodyType> decodeJson<BodyType, InnerType>(Response response) {
     final contentType = response.headers[contentTypeKey];
     var body = response.body;
@@ -38,6 +46,7 @@ class SpoonacularConverter implements Converter {
 
       // This is the list of recipes
       if (mapData.keys.contains('totalResults')) {
+        // fromJson() to convert the map into the model class.
         final spoonacularResults = SpoonacularResults.fromJson(mapData);
         final recipes = spoonacularResultsToRecipe(spoonacularResults);
         final apiQueryResults = QueryResult(
@@ -59,8 +68,7 @@ class SpoonacularConverter implements Converter {
     } catch (e) {
       chopperLogger.warning(e);
       final error = Error<InnerType>(Exception(e.toString()));
-      return Response(response.base, null,
-          error: error);
+      return Response(response.base, null, error: error);
     }
   }
 
@@ -68,5 +76,4 @@ class SpoonacularConverter implements Converter {
   Response<BodyType> convertResponse<BodyType, InnerType>(Response response) {
     return decodeJson<BodyType, InnerType>(response);
   }
-
 }

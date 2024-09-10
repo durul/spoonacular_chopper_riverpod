@@ -13,17 +13,27 @@ part 'spoonacular_service.chopper.dart';
 const String apiKey = '88c799c7f58e4c389f876e7bc8833e53';
 const String apiUrl = 'https://api.spoonacular.com/';
 
+/// A Chopper service for the Spoonacular API.
+/// It is a generic interface to make network calls.
 @ChopperApi()
 abstract class SpoonacularService extends ChopperService
     implements ServiceInterface {
   @override
   @Get(path: 'recipes/{id}/information?includeNutrition=false')
+
+  /// Query a single recipe by its ID.
+  /// This method returns a [RecipeDetailsResponse] object.
+  /// The [id] parameter is the ID of the recipe to query.
+  /// Recipe_Details page will call it.
   Future<RecipeDetailsResponse> queryRecipe(
     @Path('id') String id,
   );
 
   @override
   @Get(path: 'recipes/complexSearch')
+
+  /// Query recipes by a search query.
+  /// This method returns a [RecipeResponse] object.
   Future<RecipeResponse> queryRecipes(
     @Query('query') String query,
     @Query('offset') int offset,

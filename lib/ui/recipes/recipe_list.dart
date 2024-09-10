@@ -5,23 +5,23 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../network/service_interface.dart';
-import '../widgets/common.dart';
 
 import '../../data/models/models.dart';
 import '../../network/model_response.dart';
 import '../../network/query_result.dart';
+import '../../network/service_interface.dart';
 import '../../providers.dart';
 import '../bookmarks/bookmarks.dart';
 import '../recipe_card.dart';
 import '../recipes/recipe_details.dart';
 import '../theme/colors.dart';
+import '../widgets/common.dart';
 import '../widgets/custom_dropdown.dart';
 
 enum ListType { all, bookmarks }
 
 class RecipeList extends ConsumerStatefulWidget {
-  const RecipeList({Key? key}) : super(key: key);
+  const RecipeList({super.key});
 
   @override
   ConsumerState createState() => _RecipeListState();
@@ -62,7 +62,7 @@ class _RecipeListState extends ConsumerState<RecipeList> {
               !loading &&
               !inErrorState) {
             setState(
-                  () {
+              () {
                 loading = true;
                 newDataRequired = true;
                 currentStartPosition = currentEndPosition;
@@ -273,6 +273,8 @@ class _RecipeListState extends ConsumerState<RecipeList> {
     if (searchTextController.text.length < 3) {
       return emptySliverWidget;
     }
+    // FutureBuilder is a widget that works with asynchronous operations,
+    // allowing me to build UI based on the latest snapshot of a Future.
     return FutureBuilder<RecipeResponse>(
       future: fetchData(),
       builder: (context, snapshot) {
@@ -349,6 +351,8 @@ class _RecipeListState extends ConsumerState<RecipeList> {
     );
   }
 
+  // The future now creates a new instance of RecipeService and
+  // calls its method, queryRecipes()
   Future<RecipeResponse> fetchData() async {
     if (!newDataRequired && currentResponse != null) {
       return currentResponse!;
