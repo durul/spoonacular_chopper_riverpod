@@ -8,7 +8,7 @@ import '../widgets/common.dart';
 import '../widgets/ingredient_card.dart';
 
 class GroceryList extends ConsumerStatefulWidget {
-  const GroceryList({Key? key}) : super(key: key);
+  const GroceryList({super.key});
 
   @override
   ConsumerState<GroceryList> createState() => _GroceryListState();
@@ -29,7 +29,17 @@ class _GroceryListState extends ConsumerState<GroceryList> {
   void initState() {
     super.initState();
     searchTextController = TextEditingController(text: '');
-    // TODO: Add Ingredient Stream
+
+    /// Add Ingredient Stream
+    final repository = ref.read(repositoryProvider.notifier);
+    final ingredientStream = repository.watchAllIngredients();
+    ingredientStream.listen(
+      (ingredients) {
+        setState(() {
+          currentIngredients = ingredients;
+        });
+      },
+    );
   }
 
   @override
@@ -75,8 +85,6 @@ class _GroceryListState extends ConsumerState<GroceryList> {
 
   /// This method builds the list of ingredients that are needed and have
   Widget buildNeedHaveList() {
-    final repository = ref.watch(repositoryProvider);
-    currentIngredients = repository.currentIngredients;
     final needListIndexes = <int, bool>{};
     final haveListIndexes = <int, bool>{};
 
@@ -114,8 +122,6 @@ class _GroceryListState extends ConsumerState<GroceryList> {
   }
 
   Widget buildIngredientList() {
-    final repository = ref.watch(repositoryProvider);
-    currentIngredients = repository.currentIngredients;
     if (searching) {
       startSearch(searchTextController.text);
       return ingredientList(searchIngredients, checkBoxValues, true);
@@ -230,9 +236,7 @@ class _GroceryListState extends ConsumerState<GroceryList> {
 
   void startSearch(String searchString) {
     searching = searchString.isNotEmpty;
-    searchIngredients = ref
-        .read(repositoryProvider.notifier)
-        .findAllIngredients()
+    searchIngredients = currentIngredients
         .where((element) => true == element.name?.contains(searchString))
         .toList();
     setState(() {});
