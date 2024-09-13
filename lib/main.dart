@@ -89,7 +89,7 @@ class _MyAppState extends State<MyApp> {
         ])
       ],
       child: MaterialApp(
-        title: 'Recipes',
+        title: 'Spoonacular 🔎',
         debugShowCheckedModeBanner: false,
         themeMode: currentMode,
         theme: ThemeData(useMaterial3: true, colorScheme: lightColorScheme),

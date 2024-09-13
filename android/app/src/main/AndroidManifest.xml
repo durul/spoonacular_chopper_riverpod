@@ -2,7 +2,7 @@
     package="com.kodeco.recipe_finder">
     <uses-permission android:name="android.permission.INTERNET"/>
     <application
-        android:label="Recipe Finder"
+        android:label="Spoonacular 🔎"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
