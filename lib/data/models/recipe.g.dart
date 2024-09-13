@@ -7,7 +7,7 @@ part of 'recipe.dart';
 // **************************************************************************
 
 _$RecipeImpl _$$RecipeImplFromJson(Map<String, dynamic> json) => _$RecipeImpl(
-      id: (json['id'] as num).toInt(),
+      id: (json['id'] as num?)?.toInt(),
       label: json['label'] as String?,
       image: json['image'] as String?,
       description: json['description'] as String?,

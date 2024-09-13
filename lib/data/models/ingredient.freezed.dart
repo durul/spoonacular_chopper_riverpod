@@ -20,8 +20,8 @@ Ingredient _$IngredientFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$Ingredient {
-  int get id => throw _privateConstructorUsedError;
-  int get recipeId => throw _privateConstructorUsedError;
+  int? get id => throw _privateConstructorUsedError;
+  int? get recipeId => throw _privateConstructorUsedError;
   String? get name => throw _privateConstructorUsedError;
   double? get amount => throw _privateConstructorUsedError;
 
@@ -41,7 +41,7 @@ abstract class $IngredientCopyWith<$Res> {
           Ingredient value, $Res Function(Ingredient) then) =
       _$IngredientCopyWithImpl<$Res, Ingredient>;
   @useResult
-  $Res call({int id, int recipeId, String? name, double? amount});
+  $Res call({int? id, int? recipeId, String? name, double? amount});
 }
 
 /// @nodoc
@@ -59,20 +59,20 @@ class _$IngredientCopyWithImpl<$Res, $Val extends Ingredient>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? id = null,
-    Object? recipeId = null,
+    Object? id = freezed,
+    Object? recipeId = freezed,
     Object? name = freezed,
     Object? amount = freezed,
   }) {
     return _then(_value.copyWith(
-      id: null == id
+      id: freezed == id
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
-              as int,
-      recipeId: null == recipeId
+              as int?,
+      recipeId: freezed == recipeId
           ? _value.recipeId
           : recipeId // ignore: cast_nullable_to_non_nullable
-              as int,
+              as int?,
       name: freezed == name
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
@@ -93,7 +93,7 @@ abstract class _$$IngredientImplCopyWith<$Res>
       __$$IngredientImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({int id, int recipeId, String? name, double? amount});
+  $Res call({int? id, int? recipeId, String? name, double? amount});
 }
 
 /// @nodoc
@@ -109,20 +109,20 @@ class __$$IngredientImplCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? id = null,
-    Object? recipeId = null,
+    Object? id = freezed,
+    Object? recipeId = freezed,
     Object? name = freezed,
     Object? amount = freezed,
   }) {
     return _then(_$IngredientImpl(
-      id: null == id
+      id: freezed == id
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
-              as int,
-      recipeId: null == recipeId
+              as int?,
+      recipeId: freezed == recipeId
           ? _value.recipeId
           : recipeId // ignore: cast_nullable_to_non_nullable
-              as int,
+              as int?,
       name: freezed == name
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
@@ -138,16 +138,15 @@ class __$$IngredientImplCopyWithImpl<$Res>
 /// @nodoc
 @JsonSerializable()
 class _$IngredientImpl implements _Ingredient {
-  const _$IngredientImpl(
-      {required this.id, required this.recipeId, this.name, this.amount});
+  const _$IngredientImpl({this.id, this.recipeId, this.name, this.amount});
 
   factory _$IngredientImpl.fromJson(Map<String, dynamic> json) =>
       _$$IngredientImplFromJson(json);
 
   @override
-  final int id;
+  final int? id;
   @override
-  final int recipeId;
+  final int? recipeId;
   @override
   final String? name;
   @override
@@ -192,8 +191,8 @@ class _$IngredientImpl implements _Ingredient {
 
 abstract class _Ingredient implements Ingredient {
   const factory _Ingredient(
-      {required final int id,
-      required final int recipeId,
+      {final int? id,
+      final int? recipeId,
       final String? name,
       final double? amount}) = _$IngredientImpl;
 
@@ -201,9 +200,9 @@ abstract class _Ingredient implements Ingredient {
       _$IngredientImpl.fromJson;
 
   @override
-  int get id;
+  int? get id;
   @override
-  int get recipeId;
+  int? get recipeId;
   @override
   String? get name;
   @override

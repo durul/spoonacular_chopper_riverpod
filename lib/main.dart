@@ -7,6 +7,7 @@ import 'package:logging/logging.dart' as system_log;
 import 'package:lumberdash/lumberdash.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'mock_service/mock_service.dart';
 import 'network/spoonacular_service.dart';
 import 'providers.dart';
 import 'ui/main_screen.dart';
@@ -28,7 +29,7 @@ Future<void> main() async {
   }
 
   final sharedPrefs = await SharedPreferences.getInstance();
-  // final service = await MockService.create();
+  //final service = await MockService.create();
   final service = SpoonacularService.create();
   runApp(ProviderScope(overrides: [
     sharedPrefProvider.overrideWithValue(sharedPrefs),

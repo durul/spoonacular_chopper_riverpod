@@ -8,8 +8,8 @@ part of 'ingredient.dart';
 
 _$IngredientImpl _$$IngredientImplFromJson(Map<String, dynamic> json) =>
     _$IngredientImpl(
-      id: (json['id'] as num).toInt(),
-      recipeId: (json['recipeId'] as num).toInt(),
+      id: (json['id'] as num?)?.toInt(),
+      recipeId: (json['recipeId'] as num?)?.toInt(),
       name: json['name'] as String?,
       amount: (json['amount'] as num?)?.toDouble(),
     );

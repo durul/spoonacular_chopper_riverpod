@@ -134,7 +134,7 @@ class MemoryRepository extends Notifier<CurrentRecipeData>
     state = state.copyWith(currentRecipes: updatedList);
     _recipeStreamController.sink.add(state.currentRecipes);
 
-    deleteRecipeIngredients(recipe.id);
+    deleteRecipeIngredients(recipe.id ?? 0);
     return Future.value();
   }
 
