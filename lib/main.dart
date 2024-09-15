@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logging/logging.dart' as system_log;
 import 'package:lumberdash/lumberdash.dart';
+import 'utils/app_config/app_config_notifier.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'application.dart';

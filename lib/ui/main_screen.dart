@@ -5,6 +5,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 import '../providers.dart';
 import '../utils.dart';
+import '../utils/app_config/app_config_notifier.dart';
 import 'groceries/groceries.dart';
 import 'recipes/recipe_list.dart';
 import 'theme/colors.dart';

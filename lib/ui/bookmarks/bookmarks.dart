@@ -9,7 +9,7 @@ import '../../providers.dart';
 import '../recipes/recipe_details.dart';
 
 class Bookmarks extends ConsumerStatefulWidget {
-  const Bookmarks({Key? key}) : super(key: key);
+  const Bookmarks({super.key});
 
   @override
   ConsumerState createState() => _BookmarkState();

@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:recipes/utils/app_config/app_config_notifier.dart';
 import 'providers.dart';
 import 'ui/main_screen.dart';
 import 'ui/theme/theme.dart';
-import 'utils/app_config.dart';
+import 'utils/app_config/app_config.dart';
 
 class Application extends ConsumerStatefulWidget {
   const Application({super.key});

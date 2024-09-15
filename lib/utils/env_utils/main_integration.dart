@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../../main.dart' as app;
-import '../../providers.dart';
-import '../app_config.dart';
+import '../app_config/app_config.dart';
+import '../app_config/app_config_notifier.dart';
 
 /*
   main_integration.dart to provide its AppConfig override to the main app
@@ -20,6 +20,6 @@ void main() async {
 
   // Call the main function from my main app file with the additional override
   await app.main([], externalOverrides: [
-    appConfigProvider.overrideWithValue(appConfig),
+    createAppConfigOverride(appConfig),
   ]);
 }
