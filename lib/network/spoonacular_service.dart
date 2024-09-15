@@ -11,7 +11,6 @@ import 'spoonacular_converter.dart';
 part 'spoonacular_service.chopper.dart';
 
 const String apiKey = '88c799c7f58e4c389f876e7bc8833e53';
-const String apiUrl = 'https://api.spoonacular.com/';
 
 /// A Chopper service for the Spoonacular API.
 /// It is a generic interface to make network calls.
@@ -40,9 +39,9 @@ abstract class SpoonacularService extends ChopperService
     @Query('number') int number,
   );
 
-  static SpoonacularService create() {
+  static SpoonacularService create(String baseUrl) {
     final client = ChopperClient(
-      baseUrl: Uri.parse(apiUrl),
+      baseUrl: Uri.parse(baseUrl),
       interceptors: [
         ApiKeyInterceptor(),
         HttpLoggingInterceptor(),

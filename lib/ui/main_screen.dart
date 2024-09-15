@@ -1,16 +1,16 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_adaptive_scaffold/flutter_adaptive_scaffold.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+
 import '../providers.dart';
 import '../utils.dart';
 import 'groceries/groceries.dart';
+import 'recipes/recipe_list.dart';
 import 'theme/colors.dart';
 
-import 'recipes/recipe_list.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_adaptive_scaffold/flutter_adaptive_scaffold.dart';
-
 class MainScreen extends ConsumerStatefulWidget {
-  const MainScreen({Key? key}) : super(key: key);
+  const MainScreen({super.key});
 
   @override
   ConsumerState createState() => _MainScreenState();
@@ -25,7 +25,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
     super.initState();
     pageList.add(const RecipeList());
     pageList.add(const GroceryList());
-    // wrap getCurrentIndex in Future.microtask 
+    // wrap getCurrentIndex in Future.microtask
     Future.microtask(() async {
       getCurrentIndex();
     });
@@ -54,10 +54,12 @@ class _MainScreenState extends ConsumerState<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final appConfig = ref.watch(appConfigProvider);
+
     if (isDesktop() || isWeb()) {
       return largeLayout();
     } else {
-      return mobileLayout();
+      return mobileLayout(appConfig.appName);
     }
   }
 
@@ -155,8 +157,11 @@ class _MainScreenState extends ConsumerState<MainScreen> {
     ];
   }
 
-  Widget mobileLayout() {
+  Widget mobileLayout(String title) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text(title),
+      ),
       bottomNavigationBar: createBottomNavigationBar(),
       body: SafeArea(
         child: IndexedStack(

@@ -1,0 +1,3 @@
+#include "Generated.xcconfig"
+FLUTTER_TARGET=/Users/duruldalkanat/Flutter_Project_Directory/spoonacular_chopper/lib/main_qa.dart
+bundle_suffix=.qa

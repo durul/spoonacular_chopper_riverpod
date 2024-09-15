@@ -7,20 +7,18 @@ import 'package:logging/logging.dart' as system_log;
 import 'package:lumberdash/lumberdash.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'mock_service/mock_service.dart';
+import 'application.dart';
 import 'network/spoonacular_service.dart';
 import 'providers.dart';
-import 'ui/main_screen.dart';
-import 'ui/theme/theme.dart';
 import 'utils.dart';
 
-Future<void> main() async {
+Future<void> main(List<String> args,
+    {List<Override>? externalOverrides}) async {
   // This initializes the logging package and allows Chopper to log
   // requests and responses.
   _setupLogging();
 
-  WidgetsFlutterBinding.ensureInitialized();
-
+  // Sets the app to immersive mode, hiding system UI elements.
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
 
   if (isDesktop()) {
@@ -28,13 +26,41 @@ Future<void> main() async {
     await DesktopWindow.setMinWindowSize(const Size(260, 600));
   }
 
+  if (isMobile()) {
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
+  }
+
+  // Get access to the device's shared preferences.
   final sharedPrefs = await SharedPreferences.getInstance();
+
+  // ProviderContainer allows me to read providers outside of the widget tree.
+  final container = ProviderContainer(
+    overrides: [
+      if (externalOverrides != null) ...externalOverrides,
+    ],
+  );
+
+  final appConfig = container.read(appConfigProvider);
+  final service = SpoonacularService.create(appConfig.apiBaseUrl);
   //final service = await MockService.create();
-  final service = SpoonacularService.create();
-  runApp(ProviderScope(overrides: [
+
+  final overrides = [
     sharedPrefProvider.overrideWithValue(sharedPrefs),
     serviceProvider.overrideWithValue(service),
-  ], child: const MyApp()));
+  ];
+
+  // If externalOverrides were provided, they are added to the overrides list.
+  if (externalOverrides != null) {
+    overrides.addAll(externalOverrides);
+  }
+
+  runApp(ProviderScope(
+    overrides: overrides,
+    child: const Application(),
+  ));
 }
 
 void _setupLogging() {
@@ -45,57 +71,4 @@ void _setupLogging() {
   system_log.Logger.root.onRecord.listen((rec) {
     debugPrint('${rec.level.name}: ${rec.time}: ${rec.message}');
   });
-}
-
-class MyApp extends StatefulWidget {
-  const MyApp({super.key});
-
-  @override
-  State<MyApp> createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
-  ThemeMode currentMode = ThemeMode.light;
-
-  @override
-  Widget build(BuildContext context) {
-    return PlatformMenuBar(
-      menus: [
-        PlatformMenu(label: 'File', menus: [
-          PlatformMenuItem(
-              label: 'Dark Mode',
-              onSelected: () {
-                setState(() {
-                  currentMode = ThemeMode.dark;
-                });
-              }),
-          PlatformMenuItem(
-              label: 'Light Mode',
-              onSelected: () {
-                setState(() {
-                  currentMode = ThemeMode.light;
-                });
-              }),
-          PlatformMenuItem(
-            label: 'Quit',
-            onSelected: () {
-              setState(() {
-                SystemNavigator.pop();
-              });
-            },
-            shortcut:
-                const SingleActivator(LogicalKeyboardKey.keyQ, meta: true),
-          ),
-        ])
-      ],
-      child: MaterialApp(
-        title: 'Spoonacular 🔎',
-        debugShowCheckedModeBanner: false,
-        themeMode: currentMode,
-        theme: ThemeData(useMaterial3: true, colorScheme: lightColorScheme),
-        darkTheme: ThemeData(useMaterial3: true, colorScheme: darkColorScheme),
-        home: const MainScreen(),
-      ),
-    );
-  }
 }
