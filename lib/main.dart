@@ -5,10 +5,10 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logging/logging.dart' as system_log;
 import 'package:lumberdash/lumberdash.dart';
-import 'utils/app_config/app_config_notifier.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'application.dart';
+import 'data/repositories/db_repository.dart';
 import 'network/spoonacular_service.dart';
 import 'providers.dart';
 import 'utils.dart';
@@ -37,6 +37,10 @@ Future<void> main(List<String> args,
   // Get access to the device's shared preferences.
   final sharedPrefs = await SharedPreferences.getInstance();
 
+  // Initialize the database repository.
+  final repository = DBRepository();
+  await repository.init();
+
   // ProviderContainer allows me to read providers outside of the widget tree.
   final container = ProviderContainer(
     overrides: [
@@ -49,6 +53,9 @@ Future<void> main(List<String> args,
   //final service = await MockService.create();
 
   final overrides = [
+    repositoryProvider.overrideWith(() {
+      return repository;
+    }),
     sharedPrefProvider.overrideWithValue(sharedPrefs),
     serviceProvider.overrideWithValue(service),
   ];

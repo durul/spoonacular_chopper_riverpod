@@ -34,6 +34,14 @@ dependencies:
   path_provider: ^2.1.4
   flutter_riverpod: ^2.5.1
 
+  # Database and ORM dependencies
+  synchronized: ^3.3.0+2
+  sqlbrite: ^2.8.0
+  sqlite3_flutter_libs: ^0.5.24
+  web_ffi: ^0.7.2
+  sqlite3: ^2.4.6
+  drift: ^2.20.2
+
   menubar:
     git:
       url: https://github.com/google/flutter-desktop-embedding
@@ -49,6 +57,7 @@ dev_dependencies:
   json_serializable: ^6.8.0
   chopper_generator: ^8.0.2
   freezed: ^2.5.7
+  drift_dev: ^2.20.3
 
   flutter_lints: ^4.0.0
   test: ^1.25.7

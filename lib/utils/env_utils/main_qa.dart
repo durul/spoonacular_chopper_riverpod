@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../main.dart' as app;
-import '../../providers.dart';
 import '../app_config/app_config.dart';
 import '../app_config/app_config_notifier.dart';
 

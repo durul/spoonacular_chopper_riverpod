@@ -2,7 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'data/models/current_recipe_data.dart';
-import 'data/repositories/memory_repository.dart';
+import 'data/repositories/db_repository.dart';
 import 'network/service_interface.dart';
 import 'ui/main_screen_state.dart';
 import 'utils/app_config/app_config.dart';
@@ -18,8 +18,8 @@ final bottomNavigationProvider =
 });
 
 final repositoryProvider =
-    NotifierProvider<MemoryRepository, CurrentRecipeData>(() {
-  return MemoryRepository();
+    NotifierProvider<DBRepository, CurrentRecipeData>(() {
+  throw UnimplementedError();
 });
 
 final serviceProvider = Provider<ServiceInterface>((ref) {
