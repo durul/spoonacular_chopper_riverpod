@@ -23,6 +23,17 @@ class DBRepository extends Notifier<CurrentRecipeData> implements Repository {
   // Store a stream that watches for changes to the list of recipes.
   Stream<List<Recipe>>? recipeStream;
 
+  /// Create a new RecipeDatabase instance.
+  DBRepository({RecipeDatabase? recipeDatabase})
+      : recipeDatabase = recipeDatabase ?? RecipeDatabase();
+
+  @override
+  Future init() async {
+    // Get instances of the RecipeDao and IngredientDao.
+    _recipeDao = recipeDatabase.recipeDao;
+    _ingredientDao = recipeDatabase.ingredientDao;
+  }
+
   @override
   CurrentRecipeData build() {
     const currentRecipeData = CurrentRecipeData();
@@ -214,15 +225,6 @@ class DBRepository extends Notifier<CurrentRecipeData> implements Repository {
     final ingredients = await findRecipeIngredients(recipeId);
     // Delete the list of ingredients.
     return deleteIngredients(ingredients);
-  }
-
-  @override
-  Future init() async {
-    // Create a new RecipeDatabase instance.
-    recipeDatabase = RecipeDatabase();
-    // Get instances of the RecipeDao and IngredientDao.
-    _recipeDao = recipeDatabase.recipeDao;
-    _ingredientDao = recipeDatabase.ingredientDao;
   }
 
   @override
