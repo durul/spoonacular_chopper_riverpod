@@ -91,7 +91,6 @@ class DBRepository extends Notifier<CurrentRecipeData> implements Repository {
     return ingredientStream!;
   }
 
-  //FIXME: This method is not implemented yet correctly.
   @override
   Future<Recipe> findRecipeById(int id) async {
     // Find all of the ingredients for the given recipe.
