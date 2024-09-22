@@ -47,6 +47,20 @@ android {
         versionName flutterVersionName
     }
 
+    flavorDimensions "environment"
+    productFlavors {
+        qa {
+            dimension "environment"
+            applicationIdSuffix ".qa"
+            resValue "string", "app_name", "QA App"
+        }
+        integration {
+            dimension "environment"
+            applicationIdSuffix ".integration"
+            resValue "string", "app_name", "Int App"
+        }
+    }
+
     buildTypes {
         release {
             signingConfig signingConfigs.debug
