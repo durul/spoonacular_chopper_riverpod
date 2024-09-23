@@ -18,9 +18,7 @@ final bottomNavigationProvider =
 });
 
 final repositoryProvider =
-    NotifierProvider<DBRepository, CurrentRecipeData>(() {
-  throw UnimplementedError();
-});
+    AsyncNotifierProvider<DBRepository, CurrentRecipeData>(DBRepository.new);
 
 final serviceProvider = Provider<ServiceInterface>((ref) {
   throw UnimplementedError();

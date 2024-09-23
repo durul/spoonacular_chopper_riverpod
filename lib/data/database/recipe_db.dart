@@ -1,8 +1,15 @@
-import 'package:drift/drift.dart';
+import 'dart:convert';
+import 'dart:io';
+import 'dart:math';
 
+import 'package:drift/drift.dart';
+import 'package:drift/native.dart';
+import 'package:path/path.dart' as p;
+import 'package:path_provider/path_provider.dart';
+
+import '../../utils/logger.dart';
 import '../models/ingredient.dart';
 import '../models/recipe.dart';
-import 'connection.dart' as impl;
 
 /// The part statement is a way to combine one file into another to form
 /// a whole file.
@@ -45,12 +52,57 @@ class DbIngredient extends Table {
 )
 // RecipeDatabase definition here
 class RecipeDatabase extends _$RecipeDatabase {
-  // connection.dart will import either
-  // the native or web files so you get the proper database initialization.
-  RecipeDatabase() : super(impl.connect());
+  // // Private constructor
+  // RecipeDatabase._internal(super.queryExecutor) : super();
+  //
+  // // Singleton instance
+  // static RecipeDatabase? _instance;
+  //
+  // // Factory constructor
+  // factory RecipeDatabase(String databaseKey) {
+  //   _instance ??= RecipeDatabase._internal(openConnection(databaseKey));
+  //   return _instance!;
+  // }
+  //
+  // @override
+  // int get schemaVersion => 1;
+
+  RecipeDatabase(super.e);
 
   @override
   int get schemaVersion => 1;
+}
+
+String generateStrongEncryptionKey() {
+  final random = Random.secure();
+  final values = List<int>.generate(32, (i) => random.nextInt(256));
+  return base64Url.encode(values);
+}
+
+LazyDatabase openConnection(String databaseKey) {
+  return LazyDatabase(() async {
+    final dbFolder = await getApplicationDocumentsDirectory();
+    final file = File(p.join(dbFolder.path, 'features.sqlite'));
+    return NativeDatabase(
+      file,
+      logStatements: true, // DEBUG_MODE
+      setup: (database) {
+        // print versions
+        logInfo(
+            "cipher_version isEmpty ${database.select('PRAGMA cipher_version;').isEmpty}");
+        logInfo(
+            "sqlite_version isEmpty ${database.select('SELECT sqlite_version()').isEmpty}");
+        // set database key
+        try {
+          database.execute("PRAGMA key = '$databaseKey';");
+        } on SqliteException catch (e) {
+          if (e.resultCode == 26) {
+            logInfo('database, the password is probably wrong');
+          }
+        }
+      },
+    );
+  });
 }
 
 /// RecipeDao Data Access Object (DAO) definition here

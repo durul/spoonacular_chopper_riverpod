@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../data/models/current_recipe_data.dart';
 import '../../data/models/models.dart';
 import '../../network/model_response.dart';
 import '../../network/query_result.dart';
@@ -102,10 +103,18 @@ class _RecipeListState extends ConsumerState<RecipeList> {
 
   @override
   Widget build(BuildContext context) {
-    return switch (currentType) {
-      ListType.all => buildRecipeList(),
-      ListType.bookmarks => buildBookmarkList()
-    };
+    final dbRepositoryAsyncValue = ref.watch(repositoryProvider);
+
+    return dbRepositoryAsyncValue.when(
+      data: (currentRecipeData) {
+        return switch (currentType) {
+          ListType.all => buildRecipeList(),
+          ListType.bookmarks => buildBookmarkList(currentRecipeData)
+        };
+      },
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (error, stack) => Center(child: Text('Error: $error')),
+    );
   }
 
   Widget buildRecipeList() {
@@ -143,7 +152,7 @@ class _RecipeListState extends ConsumerState<RecipeList> {
     );
   }
 
-  Widget buildBookmarkList() {
+  Widget buildBookmarkList(CurrentRecipeData currentRecipeData) {
     return buildScrollList([
       _buildHeader(),
       _buildTypePicker(),
@@ -273,8 +282,6 @@ class _RecipeListState extends ConsumerState<RecipeList> {
     if (searchTextController.text.length < 3) {
       return emptySliverWidget;
     }
-    // FutureBuilder is a widget that works with asynchronous operations,
-    // allowing me to build UI based on the latest snapshot of a Future.
     return FutureBuilder<RecipeResponse>(
       future: fetchData(),
       builder: (context, snapshot) {
@@ -292,7 +299,6 @@ class _RecipeListState extends ConsumerState<RecipeList> {
           }
 
           loading = false;
-          // Hit an error
           if (false == snapshot.data?.isSuccessful) {
             var errorMessage = 'Problems getting data';
             if (snapshot.data?.error != null &&
@@ -337,7 +343,6 @@ class _RecipeListState extends ConsumerState<RecipeList> {
           }
         } else {
           if (currentCount == 0) {
-            // Show a loading indicator while waiting for the movies
             return const SliverFillRemaining(
               child: Center(
                 child: CircularProgressIndicator(),
@@ -351,8 +356,6 @@ class _RecipeListState extends ConsumerState<RecipeList> {
     );
   }
 
-  // The future now creates a new instance of RecipeService and
-  // calls its method, queryRecipes()
   Future<RecipeResponse> fetchData() async {
     if (!newDataRequired && currentResponse != null) {
       return currentResponse!;
@@ -424,9 +427,6 @@ class _RecipeListState extends ConsumerState<RecipeList> {
               selected: {currentType},
               onSelectionChanged: (Set<ListType> newSelection) {
                 setState(() {
-                  // By default there is only a single segment that can be
-                  // selected at one time, so its value is always the first
-                  // item in the selected set.
                   currentType = newSelection.first;
                 });
               },
