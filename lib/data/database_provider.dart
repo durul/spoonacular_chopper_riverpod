@@ -37,7 +37,7 @@ class DatabaseProvider {
     await _loadSecureStorageLibrary();
 
     final dbKey = await _getOrCreateDbKey();
-    _recipeDatabase = RecipeDatabase(openConnection(dbKey));
+    _recipeDatabase = await RecipeDatabase.connect(dbKey);
 
     driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
     _recipeDao = RecipeDao(_recipeDatabase);

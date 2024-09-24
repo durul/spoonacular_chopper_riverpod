@@ -77,33 +77,6 @@ class RecipeDatabase extends _$RecipeDatabase {
   }
 }
 
-LazyDatabase openConnection(String databaseKey) {
-  return LazyDatabase(() async {
-    final dbFolder = await getApplicationDocumentsDirectory();
-    final file = File(p.join(dbFolder.path, 'db.sqlite'));
-    return NativeDatabase(
-      file,
-      logStatements: true, // DEBUG_MODE
-      setup: (database) {
-        // print versions
-        logInfo(
-            "cipher_version isEmpty ${database.select('PRAGMA cipher_version;').isEmpty}");
-        logInfo(
-            "sqlite_version isEmpty ${database.select('SELECT sqlite_version()').isEmpty}");
-        // set database key
-        try {
-          database.execute('PRAGMA cipher_compatibility = 3');
-          database.execute("PRAGMA key = '$databaseKey';");
-        } on SqliteException catch (e) {
-          if (e.resultCode == 26) {
-            logInfo('database, the password is probably wrong');
-          }
-        }
-      },
-    );
-  });
-}
-
 /// RecipeDao Data Access Object (DAO) definition here
 @DriftAccessor(tables: [DbRecipe])
 class RecipeDao extends DatabaseAccessor<RecipeDatabase> with _$RecipeDaoMixin {
