@@ -1,4 +1,4 @@
-import 'data/database_provider.dart';
+import 'data/provider/database_provider.dart';
 import 'data/secure_storage.dart';
 
 ///
@@ -7,7 +7,7 @@ import 'data/secure_storage.dart';
 class Globals {
   Globals._();
 
-  static final instance = Globals._();
+  static Globals instance = Globals._();
 
   late final SecureStorage secureStorage;
   late final DatabaseProvider databaseProvider;

@@ -1,11 +1,5 @@
-import 'dart:io';
-
 import 'package:drift/drift.dart';
-import 'package:drift/native.dart';
-import 'package:path/path.dart' as p;
-import 'package:path_provider/path_provider.dart';
 
-import '../../utils/logger.dart';
 import '../models/ingredient.dart';
 import '../models/recipe.dart';
 
@@ -50,49 +44,10 @@ class DbIngredient extends Table {
 )
 // RecipeDatabase definition here
 class RecipeDatabase extends _$RecipeDatabase {
-  RecipeDatabase(QueryExecutor e) : super(e);
+  RecipeDatabase(super.e);
 
   @override
   int get schemaVersion => 1;
-
-  LazyDatabase openConnection(String databaseKey) {
-    return LazyDatabase(() async {
-      final dbFolder = await getApplicationDocumentsDirectory();
-      final file = File(p.join(dbFolder.path, 'db.sqlite'));
-      return NativeDatabase(
-        file,
-        logStatements: true, // DEBUG_MODE
-        setup: (database) {
-          final result = database.select('pragma cipher_version');
-          logInfo('cipher_version isEmpty ${result.isEmpty}');
-
-          if (result.isEmpty) {
-            throw UnsupportedError(
-              'This database needs to run with SQLCipher, but that library is '
-              'not available!',
-            );
-          }
-
-          // print versions
-          logInfo(
-              "cipher_version isEmpty ${database.select('PRAGMA cipher_version;').isEmpty}");
-          logInfo(
-              "sqlite_version isEmpty ${database.select('SELECT sqlite_version()').isEmpty}");
-          // set database key
-          try {
-            database.execute("PRAGMA key = '$databaseKey';");
-
-            // Test that the key is correct by selecting from a table
-            database.execute('select count(*) from sqlite_master');
-          } on SqliteException catch (e) {
-            if (e.resultCode == 26) {
-              logInfo('database, the password is probably wrong');
-            }
-          }
-        },
-      );
-    });
-  }
 }
 
 /// RecipeDao Data Access Object (DAO) definition here
