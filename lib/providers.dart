@@ -17,9 +17,6 @@ final bottomNavigationProvider =
   return MainScreenStateProvider();
 });
 
-final repositoryProvider =
-    AsyncNotifierProvider<DBRepository, CurrentRecipeData>(DBRepository.new);
-
 final serviceProvider = Provider<ServiceInterface>((ref) {
   throw UnimplementedError();
 });
@@ -29,3 +26,6 @@ final serviceProvider = Provider<ServiceInterface>((ref) {
 final appConfigProvider = NotifierProvider<AppConfigNotifier, AppConfig>(() {
   throw UnimplementedError('appConfigProvider must be overridden before use');
 });
+
+final repositoryProvider =
+    AsyncNotifierProvider<DBRepository, CurrentRecipeData>(DBRepository.new);

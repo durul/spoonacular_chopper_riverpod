@@ -18,7 +18,18 @@ class DBRepository extends AsyncNotifier<CurrentRecipeData>
   Stream<List<Recipe>>? recipeStream;
 
   @override
+  Future<void> init() async {
+    // This method is called before build() and can be used for initialization
+    // that doesn't depend on ref
+    await Globals.instance.initialize();
+  }
+
+  @override
   Future<CurrentRecipeData> build() async {
+    // This method is called after init() and can use ref
+    _recipeDatabase = Globals.instance.databaseProvider.recipeDatabase;
+    _recipeDao = _recipeDatabase.recipeDao;
+    _ingredientDao = _recipeDatabase.ingredientDao;
     return const CurrentRecipeData();
   }
 
@@ -167,14 +178,5 @@ class DBRepository extends AsyncNotifier<CurrentRecipeData>
   @override
   void close() {
     _recipeDatabase.close();
-  }
-
-  @override
-  Future<void> init() async {
-    await Globals.instance
-        .initializeGlobals(); // Ensure database is initialized
-    _recipeDatabase = Globals.instance.recipeDatabase;
-    _recipeDao = _recipeDatabase.recipeDao;
-    _ingredientDao = _recipeDatabase.ingredientDao;
   }
 }

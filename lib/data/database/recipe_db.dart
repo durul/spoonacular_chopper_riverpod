@@ -69,8 +69,21 @@ class RecipeDatabase extends _$RecipeDatabase {
 
   RecipeDatabase(super.e);
 
+  late final recipeDao = RecipeDao(this);
+  late final ingredientDao = IngredientDao(this);
+
   @override
   int get schemaVersion => 1;
+
+  @override
+  MigrationStrategy get migration => MigrationStrategy(onUpgrade: (migrator, from, to) async {
+    if (from < schemaVersion) {
+      await migrator.deleteTable(dbRecipe.actualTableName);
+      await migrator.createTable(dbRecipe);
+    }
+  }, beforeOpen: (details) async {
+    await customStatement('PRAGMA foreign_keys = ON');
+  });
 }
 
 String generateStrongEncryptionKey() {
@@ -79,10 +92,11 @@ String generateStrongEncryptionKey() {
   return base64Url.encode(values);
 }
 
+
 LazyDatabase openConnection(String databaseKey) {
   return LazyDatabase(() async {
     final dbFolder = await getApplicationDocumentsDirectory();
-    final file = File(p.join(dbFolder.path, 'features.sqlite'));
+    final file = File(p.join(dbFolder.path, 'db.sqlite'));
     return NativeDatabase(
       file,
       logStatements: true, // DEBUG_MODE

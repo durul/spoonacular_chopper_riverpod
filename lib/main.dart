@@ -9,18 +9,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'application.dart';
 import 'data/repositories/db_repository.dart';
-import 'global.dart';
 import 'network/spoonacular_service.dart';
 import 'providers.dart';
 import 'utils.dart';
 
 Future<void> main(List<String> args,
     {List<Override>? externalOverrides}) async {
-  // Initialize Globals
-  final global = Globals.instance.initializeGlobals();
-  global.then((value) => print('Globals initialized'));
-
-
   // This initializes the logging package and allows Chopper to log
   // requests and responses.
   _setupLogging();

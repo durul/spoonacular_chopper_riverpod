@@ -9,41 +9,43 @@ import 'database/recipe_db.dart';
 import 'secure_storage.dart';
 
 class DatabaseProvider {
-  DatabaseProvider([SecureStorage? secureStorage]) {
-    if (secureStorage != null) {
-      _secureStorage = secureStorage;
-      _hasSecureStorage = true;
-    }
+  DatabaseProvider._(this._secureStorage);
+
+  static Future<DatabaseProvider> initialize(
+      SecureStorage secureStorage) async {
+    final provider = DatabaseProvider._(secureStorage);
+    await provider._initDatabase();
+    return provider;
   }
 
-  late final SecureStorage _secureStorage;
-  bool _hasSecureStorage = false;
-  static RecipeDatabase? _database;
+  Future<void> _initDatabase() async {
+    final dbKey = await _getOrCreateDbKey();
+    _recipeDatabase = RecipeDatabase(openConnection(dbKey));
+  }
+
+  late RecipeDao _recipeDao;
+  late IngredientDao _ingredientDao;
+  late final RecipeDatabase _recipeDatabase;
+
+  final SecureStorage _secureStorage;
 
   static const kDbKey = 'db_key';
 
-  IngredientDao get ingredientDao => database.ingredientDao;
-  RecipeDao get recipeDao => database.recipeDao;
+  RecipeDao get recipeDao => _recipeDao;
 
-  RecipeDatabase get database {
-    if (_database == null) {
-      throw StateError('Database has not been initialized. Call create() first.');
-    }
-    return _database!;
-  }
+  IngredientDao get ingredientDao => _ingredientDao;
 
-  Future<void> create() async {
-    if (_database != null) return;
-    if (!_hasSecureStorage) {
-      throw StateError('SecureStorage not initialized');
-    }
-    await _loadSecureStorageLibrary();
-    final databaseKey = await _getKey();
-    _database = RecipeDatabase(openConnection(databaseKey));
+  RecipeDatabase get recipeDatabase => _recipeDatabase;
 
-    // Set this option to suppress the warning
-    driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
-  }
+  // Future<void> create() async {
+  //   await _loadSecureStorageLibrary();
+  //
+  //   _recipeDatabase = RecipeDatabase(openConnection(await _getOrCreateDbKey()));
+  //   _recipeDao = RecipeDao(_recipeDatabase);
+  //   _ingredientDao = IngredientDao(_recipeDatabase);
+  //   // Set this option to suppress the warning
+  //   driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
+  // }
 
   Future<void> _loadSecureStorageLibrary() async {
     if (Platform.isIOS) {
@@ -64,22 +66,19 @@ class DatabaseProvider {
   Future<void> _openOnAndroid() async {
     try {
       open.overrideFor(OperatingSystem.android,
-              () => DynamicLibrary.open('libsqlcipher.so'));
+          () => DynamicLibrary.open('libsqlcipher.so'));
     } catch (error) {
       logErrorText(error.toString());
     }
   }
 
-  Future<String> _getKey() async {
-    if (!_hasSecureStorage) {
-      throw StateError('SecureStorage not initialized');
+  Future<String> _getOrCreateDbKey() async {
+    const kDbKey = 'db_key';
+    var dbKey = await _secureStorage.read(kDbKey);
+    if (dbKey == null) {
+      dbKey = generateStrongEncryptionKey();
+      await _secureStorage.write(kDbKey, dbKey);
     }
-    var data = await _secureStorage.read(kDbKey);
-    if (data == null) {
-      final newKey = generateStrongEncryptionKey();
-      await _secureStorage.write(kDbKey, newKey);
-      return newKey;
-    }
-    return data;
+    return dbKey;
   }
 }
