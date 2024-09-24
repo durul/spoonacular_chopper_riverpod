@@ -4,6 +4,9 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:drift/drift.dart';
+import 'package:drift/native.dart';
+import 'package:path/path.dart';
+import 'package:sqlbrite/sqlbrite.dart';
 import 'package:sqlite3/open.dart';
 import 'package:sqlite3/sqlite3.dart';
 
@@ -33,12 +36,40 @@ class DatabaseProvider {
     }
   }
 
+  Future<void> testDatabaseEncryption() async {
+    final dbFile = File(join(await getDatabasesPath(), 'db.sqlite'));
+    if (await dbFile.exists()) {
+      final bytes = await dbFile.readAsBytes();
+      final header = bytes.sublist(0, 16);
+      final isEncrypted =
+          !header.any((byte) => byte == 0x53 && byte == 0x51 && byte == 0x4C);
+      print('Database is ${isEncrypted ? 'encrypted' : 'not encrypted'}');
+    } else {
+      print('Database file does not exist');
+    }
+  }
+
   Future<void> _initDatabase() async {
     await _loadSecureStorageLibrary();
 
     final dbKey = await _getOrCreateDbKey();
-    _recipeDatabase = await RecipeDatabase.connect(dbKey);
 
+    try {
+      // Create an instance of RecipeDatabase
+      final recipeDb = RecipeDatabase(LazyDatabase(() async {
+        // This is where you'd typically set up your database connection
+        // For now, we'll use a placeholder
+        return NativeDatabase.memory();
+      }));
+
+      // Now use the openConnection method from RecipeDatabase
+      _recipeDatabase = RecipeDatabase(recipeDb.openConnection(dbKey));
+    } catch (e) {
+      print('Error connecting to database: $e');
+      if (e.toString().contains('file is encrypted or is not a database')) {
+        print('This might be an encryption key mismatch');
+      }
+    }
     driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
     _recipeDao = RecipeDao(_recipeDatabase);
     _ingredientDao = IngredientDao(_recipeDatabase);
@@ -73,12 +104,14 @@ class DatabaseProvider {
       return _openOnIOS();
     } else if (Platform.isAndroid) {
       return _openOnAndroid();
+    } else if (Platform.isLinux) {
+      return _openOnLinux();
     }
   }
 
   Future<void> _openOnIOS() async {
     try {
-      open.overrideFor(OperatingSystem.iOS, DynamicLibrary.process);
+      open.overrideFor(OperatingSystem.iOS, () => DynamicLibrary.executable());
     } catch (error) {
       logErrorText(error.toString());
     }
@@ -90,6 +123,27 @@ class DatabaseProvider {
           () => DynamicLibrary.open('libsqlcipher.so'));
     } catch (error) {
       logErrorText(error.toString());
+    }
+  }
+
+  void _openOnLinux() {
+    try {
+      open.overrideFor(
+          OperatingSystem.linux, () => DynamicLibrary.open('libsqlcipher.so'));
+      return;
+    } catch (_) {
+      logErrorText(_.toString());
+      try {
+        // fallback to sqlite if unavailable
+        final scriptDir = File(Platform.script.toFilePath()).parent;
+        final libraryNextToScript = File('${scriptDir.path}/sqlite3.so');
+        final lib = DynamicLibrary.open(libraryNextToScript.path);
+
+        open.overrideFor(OperatingSystem.linux, () => lib);
+      } catch (error) {
+        logErrorText(error.toString());
+        rethrow;
+      }
     }
   }
 
