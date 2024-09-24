@@ -5,7 +5,9 @@ import 'dart:math';
 
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
+import 'package:path/path.dart' as p;
 import 'package:path/path.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:sqlbrite/sqlbrite.dart';
 import 'package:sqlite3/open.dart';
 import 'package:sqlite3/sqlite3.dart';
@@ -51,28 +53,32 @@ class DatabaseProvider {
 
   Future<void> _initDatabase() async {
     await _loadSecureStorageLibrary();
-
     final dbKey = await _getOrCreateDbKey();
 
     try {
-      // Create an instance of RecipeDatabase
-      final recipeDb = RecipeDatabase(LazyDatabase(() async {
-        // This is where you'd typically set my your database connection
-        // For now, we'll use a placeholder
-        return NativeDatabase.memory();
+      _recipeDatabase = RecipeDatabase(LazyDatabase(() async {
+        final dbFolder = await getApplicationDocumentsDirectory();
+        final file = File(p.join(dbFolder.path, 'db.sqlite'));
+        return NativeDatabase(
+          file,
+          logStatements: true,
+          setup: (database) {
+            // Your existing setup code here
+            database.execute("PRAGMA key = '$dbKey';");
+          },
+        );
       }));
-
-      // Now use the openConnection method from RecipeDatabase
-      _recipeDatabase = RecipeDatabase(recipeDb.openConnection(dbKey));
     } catch (e) {
       logInfo('Error connecting to database: $e');
       if (e.toString().contains('file is encrypted or is not a database')) {
         logInfo('This might be an encryption key mismatch');
       }
     }
+
     driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
-    _recipeDao = RecipeDao(_recipeDatabase);
-    _ingredientDao = IngredientDao(_recipeDatabase);
+
+    _recipeDao = _recipeDatabase.recipeDao;
+    _ingredientDao = _recipeDatabase.ingredientDao;
   }
 
   late RecipeDao _recipeDao;

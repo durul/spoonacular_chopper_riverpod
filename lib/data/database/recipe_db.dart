@@ -50,7 +50,7 @@ class DbIngredient extends Table {
 )
 // RecipeDatabase definition here
 class RecipeDatabase extends _$RecipeDatabase {
-  RecipeDatabase(LazyDatabase super.lazyDatabase);
+  RecipeDatabase(QueryExecutor e) : super(e);
 
   @override
   int get schemaVersion => 1;
