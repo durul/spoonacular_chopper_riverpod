@@ -983,13 +983,6 @@
             </list>
           </value>
         </entry>
-        <entry key="sqlite3_flutter_libs">
-          <value>
-            <list>
-              <option value="$USER_HOME$/.pub-cache/hosted/pub.dev/sqlite3_flutter_libs-0.5.24/lib" />
-            </list>
-          </value>
-        </entry>
         <entry key="sqlparser">
           <value>
             <list>
@@ -1361,7 +1354,6 @@
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/sqlbrite-2.8.0/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/sqlcipher_flutter_libs-0.6.4/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/sqlite3-2.4.6/lib" />
-      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/sqlite3_flutter_libs-0.5.24/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/sqlparser-0.38.1/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/stack_trace-1.11.1/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/state_notifier-1.0.0/lib" />
