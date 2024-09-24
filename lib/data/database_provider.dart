@@ -43,9 +43,9 @@ class DatabaseProvider {
       final header = bytes.sublist(0, 16);
       final isEncrypted =
           !header.any((byte) => byte == 0x53 && byte == 0x51 && byte == 0x4C);
-      print('Database is ${isEncrypted ? 'encrypted' : 'not encrypted'}');
+      logInfo('Database is ${isEncrypted ? 'encrypted' : 'not encrypted'}');
     } else {
-      print('Database file does not exist');
+      logInfo('Database file does not exist');
     }
   }
 
@@ -57,7 +57,7 @@ class DatabaseProvider {
     try {
       // Create an instance of RecipeDatabase
       final recipeDb = RecipeDatabase(LazyDatabase(() async {
-        // This is where you'd typically set up your database connection
+        // This is where you'd typically set my your database connection
         // For now, we'll use a placeholder
         return NativeDatabase.memory();
       }));
@@ -65,9 +65,9 @@ class DatabaseProvider {
       // Now use the openConnection method from RecipeDatabase
       _recipeDatabase = RecipeDatabase(recipeDb.openConnection(dbKey));
     } catch (e) {
-      print('Error connecting to database: $e');
+      logInfo('Error connecting to database: $e');
       if (e.toString().contains('file is encrypted or is not a database')) {
-        print('This might be an encryption key mismatch');
+        logInfo('This might be an encryption key mismatch');
       }
     }
     driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;

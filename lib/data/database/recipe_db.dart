@@ -2,13 +2,12 @@ import 'dart:io';
 
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
-import 'package:drift_sqflite/drift_sqflite.dart';
+import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
 import '../../utils/logger.dart';
 import '../models/ingredient.dart';
 import '../models/recipe.dart';
-import 'package:path/path.dart' as p;
 
 /// The part statement is a way to combine one file into another to form
 /// a whole file.
@@ -51,7 +50,7 @@ class DbIngredient extends Table {
 )
 // RecipeDatabase definition here
 class RecipeDatabase extends _$RecipeDatabase {
-  RecipeDatabase(LazyDatabase lazyDatabase) : super(lazyDatabase);
+  RecipeDatabase(LazyDatabase super.lazyDatabase);
 
   @override
   int get schemaVersion => 1;
@@ -70,7 +69,7 @@ class RecipeDatabase extends _$RecipeDatabase {
           if (result.isEmpty) {
             throw UnsupportedError(
               'This database needs to run with SQLCipher, but that library is '
-                  'not available!',
+              'not available!',
             );
           }
 
@@ -94,7 +93,6 @@ class RecipeDatabase extends _$RecipeDatabase {
       );
     });
   }
-
 }
 
 /// RecipeDao Data Access Object (DAO) definition here
@@ -224,8 +222,4 @@ DbIngredientCompanion ingredientToInsertableDbIngredient(
     name: ingredient.name ?? '',
     amount: ingredient.amount ?? 0,
   );
-}
-
-extension on File {
-  void execute(String s) {}
 }
