@@ -282,6 +282,13 @@
             </list>
           </value>
         </entry>
+        <entry key="drift_sqflite">
+          <value>
+            <list>
+              <option value="$USER_HOME$/.pub-cache/hosted/pub.dev/drift_sqflite-2.0.1/lib" />
+            </list>
+          </value>
+        </entry>
         <entry key="equatable">
           <value>
             <list>
@@ -1254,6 +1261,7 @@
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/desktop_window-0.4.0/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/drift-2.20.2/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/drift_dev-2.20.3/lib" />
+      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/drift_sqflite-2.0.1/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/equatable-2.0.5/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/fake_async-1.3.1/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/ffi-2.1.3/lib" />

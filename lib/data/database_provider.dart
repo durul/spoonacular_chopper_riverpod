@@ -1,8 +1,11 @@
+import 'dart:convert';
 import 'dart:ffi';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:drift/drift.dart';
 import 'package:sqlite3/open.dart';
+import 'package:sqlite3/sqlite3.dart';
 
 import '../../utils/logger.dart';
 import 'database/recipe_db.dart';
@@ -18,9 +21,27 @@ class DatabaseProvider {
     return provider;
   }
 
+  Future<void> testDatabaseConnection() async {
+    try {
+      await _recipeDatabase.customSelect('SELECT 1').getSingle();
+      logInfo('Database connection successful');
+    } catch (e) {
+      logInfo('Database connection failed');
+      if (e is SqliteException && e.extendedResultCode == 26) {
+        logInfo('Encryption key might be incorrect');
+      }
+    }
+  }
+
   Future<void> _initDatabase() async {
+    await _loadSecureStorageLibrary();
+
     final dbKey = await _getOrCreateDbKey();
     _recipeDatabase = RecipeDatabase(openConnection(dbKey));
+
+    driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
+    _recipeDao = RecipeDao(_recipeDatabase);
+    _ingredientDao = IngredientDao(_recipeDatabase);
   }
 
   late RecipeDao _recipeDao;
@@ -37,17 +58,17 @@ class DatabaseProvider {
 
   RecipeDatabase get recipeDatabase => _recipeDatabase;
 
-  // Future<void> create() async {
-  //   await _loadSecureStorageLibrary();
-  //
-  //   _recipeDatabase = RecipeDatabase(openConnection(await _getOrCreateDbKey()));
-  //   _recipeDao = RecipeDao(_recipeDatabase);
-  //   _ingredientDao = IngredientDao(_recipeDatabase);
-  //   // Set this option to suppress the warning
-  //   driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
-  // }
-
   Future<void> _loadSecureStorageLibrary() async {
+    if (Platform.isIOS || Platform.isAndroid) {
+      await loadSqlite3Flutter();
+    } else if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
+      sqlite3.openInMemory();
+    } else {
+      throw UnsupportedError('Unsupported platform');
+    }
+  }
+
+  Future<void> loadSqlite3Flutter() async {
     if (Platform.isIOS) {
       return _openOnIOS();
     } else if (Platform.isAndroid) {
@@ -80,5 +101,11 @@ class DatabaseProvider {
       await _secureStorage.write(kDbKey, dbKey);
     }
     return dbKey;
+  }
+
+  String generateStrongEncryptionKey() {
+    final random = Random.secure();
+    final values = List<int>.generate(32, (i) => random.nextInt(256));
+    return base64Url.encode(values);
   }
 }

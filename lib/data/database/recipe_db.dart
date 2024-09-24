@@ -1,9 +1,8 @@
-import 'dart:convert';
 import 'dart:io';
-import 'dart:math';
 
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
+import 'package:drift_sqflite/drift_sqflite.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
@@ -52,46 +51,31 @@ class DbIngredient extends Table {
 )
 // RecipeDatabase definition here
 class RecipeDatabase extends _$RecipeDatabase {
-  // // Private constructor
-  // RecipeDatabase._internal(super.queryExecutor) : super();
-  //
-  // // Singleton instance
-  // static RecipeDatabase? _instance;
-  //
-  // // Factory constructor
-  // factory RecipeDatabase(String databaseKey) {
-  //   _instance ??= RecipeDatabase._internal(openConnection(databaseKey));
-  //   return _instance!;
-  // }
-  //
-  // @override
-  // int get schemaVersion => 1;
-
   RecipeDatabase(super.e);
-
-  late final recipeDao = RecipeDao(this);
-  late final ingredientDao = IngredientDao(this);
 
   @override
   int get schemaVersion => 1;
 
   @override
-  MigrationStrategy get migration => MigrationStrategy(onUpgrade: (migrator, from, to) async {
-    if (from < schemaVersion) {
-      await migrator.deleteTable(dbRecipe.actualTableName);
-      await migrator.createTable(dbRecipe);
-    }
-  }, beforeOpen: (details) async {
-    await customStatement('PRAGMA foreign_keys = ON');
-  });
-}
+  MigrationStrategy get migration =>
+      MigrationStrategy(onUpgrade: (migrator, from, to) async {
+        if (from == 1) {}
+      }, beforeOpen: (details) async {
+        await customStatement('PRAGMA foreign_keys = ON');
+      });
 
-String generateStrongEncryptionKey() {
-  final random = Random.secure();
-  final values = List<int>.generate(32, (i) => random.nextInt(256));
-  return base64Url.encode(values);
+  static Future<RecipeDatabase> connect(String encryptionKey) async {
+    final executor = SqfliteQueryExecutor.inDatabaseFolder(
+      path: 'db.sqlite',
+      singleInstance: true,
+      creator: (db) {
+        db.execute('PRAGMA cipher_compatibility = 3');
+        db.execute("PRAGMA key = '$encryptionKey'");
+      },
+    );
+    return RecipeDatabase(executor);
+  }
 }
-
 
 LazyDatabase openConnection(String databaseKey) {
   return LazyDatabase(() async {
@@ -108,6 +92,7 @@ LazyDatabase openConnection(String databaseKey) {
             "sqlite_version isEmpty ${database.select('SELECT sqlite_version()').isEmpty}");
         // set database key
         try {
+          database.execute('PRAGMA cipher_compatibility = 3');
           database.execute("PRAGMA key = '$databaseKey';");
         } on SqliteException catch (e) {
           if (e.resultCode == 26) {
@@ -246,4 +231,8 @@ DbIngredientCompanion ingredientToInsertableDbIngredient(
     name: ingredient.name ?? '',
     amount: ingredient.amount ?? 0,
   );
+}
+
+extension on File {
+  void execute(String s) {}
 }

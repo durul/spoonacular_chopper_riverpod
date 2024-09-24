@@ -41,6 +41,7 @@ dependencies:
   sqlite3: ^2.4.6
   web_ffi: ^0.7.2
   drift: ^2.20.2
+  drift_sqflite: ^2.0.1
 
   # Encryption dependencies
   flutter_secure_storage: ^9.2.2

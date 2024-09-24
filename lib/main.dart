@@ -8,7 +8,9 @@ import 'package:lumberdash/lumberdash.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'application.dart';
+import 'data/database_provider.dart';
 import 'data/repositories/db_repository.dart';
+import 'data/secure_storage.dart';
 import 'network/spoonacular_service.dart';
 import 'providers.dart';
 import 'utils.dart';
@@ -40,6 +42,9 @@ Future<void> main(List<String> args,
   // Initialize the database repository.
   final repository = DBRepository();
   await repository.init();
+
+  final databaseProvider = await DatabaseProvider.initialize(SecureStorage());
+  await databaseProvider.testDatabaseConnection();
 
   // ProviderContainer allows me to read providers outside of the widget tree.
   final container = ProviderContainer(
