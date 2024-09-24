@@ -23,14 +23,17 @@ dependencies:
   flutter_slidable: ^3.1.1
   platform: ^3.1.5
   freezed_annotation: ^2.4.4
-  http: ^1.2.2
-  chopper: ^8.0.2
   flutter_svg: ^2.0.10+1
-  shared_preferences: ^2.3.2
   json_annotation: ^4.9.0
   flutter_html: ^3.0.0-beta.2
   lumberdash: ^3.0.0
   colorize_lumberdash: ^3.0.0
+
+  # Networking dependencies
+  http: ^1.2.2
+  chopper: ^8.0.2
+
+  # state management
   path_provider: ^2.1.4
   flutter_riverpod: ^2.5.1
 
@@ -41,7 +44,11 @@ dependencies:
   sqlite3: ^2.4.6
   web_ffi: ^0.7.2
   drift: ^2.20.2
+
+  # local storage
   drift_sqflite: ^2.0.1
+  shared_preferences: ^2.3.2
+  sqlcipher_flutter_libs: ^0.6.4
 
   # Encryption dependencies
   flutter_secure_storage: ^9.2.2
