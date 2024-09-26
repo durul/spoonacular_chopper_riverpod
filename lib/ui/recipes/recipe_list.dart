@@ -105,6 +105,7 @@ class _RecipeListState extends ConsumerState<RecipeList> {
   Widget build(BuildContext context) {
     final dbRepositoryAsyncValue = ref.watch(repositoryProvider);
 
+    // Allowing for more dynamic data management.
     return dbRepositoryAsyncValue.when(
       data: (currentRecipeData) {
         return switch (currentType) {
