@@ -53,7 +53,7 @@ class RecipeDatabase extends _$RecipeDatabase {
 /// RecipeDao Data Access Object (DAO) definition here
 @DriftAccessor(tables: [DbRecipe])
 class RecipeDao extends DatabaseAccessor<RecipeDatabase> with _$RecipeDaoMixin {
-  // Create a field to hold an instance of your database.
+  // Create a field to hold an instance of my database.
   final RecipeDatabase db;
 
   RecipeDao(this.db) : super(db);

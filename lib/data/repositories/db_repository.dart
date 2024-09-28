@@ -8,6 +8,8 @@ import '../models/current_recipe_data.dart';
 import '../models/models.dart';
 import '../repositories/repository.dart';
 
+/// DBRepository class serves as an mediator between the database and the
+/// application logic. Implements CRUD operations for recipes and ingredients.
 class DBRepository extends AsyncNotifier<CurrentRecipeData>
     implements Repository {
   late RecipeDatabase _recipeDatabase;
@@ -24,6 +26,7 @@ class DBRepository extends AsyncNotifier<CurrentRecipeData>
     await Globals.instance.initialize();
   }
 
+  /// Represents the current state of recipe data.
   @override
   Future<CurrentRecipeData> build() async {
     // This method is called after init() and can use ref
@@ -33,11 +36,17 @@ class DBRepository extends AsyncNotifier<CurrentRecipeData>
     return const CurrentRecipeData();
   }
 
+  /// Updates the state of the repository.
   Future<void> updateState(
       CurrentRecipeData Function(CurrentRecipeData) update) async {
     state = AsyncValue.data(update(state.value!));
   }
 
+  /// CRUD Operations
+
+  /// Find all recipes and their ingredients.
+  /// Returns a list of recipes.
+  /// If the recipes are already in the state, it returns the cached recipes.
   @override
   Future<List<Recipe>> findAllRecipes() async {
     final dbRecipes = await _recipeDao.findAllRecipes();
@@ -54,12 +63,14 @@ class DBRepository extends AsyncNotifier<CurrentRecipeData>
     return recipes;
   }
 
+  /// Provide streams to observe changes in recipes.
   @override
   Stream<List<Recipe>> watchAllRecipes() {
     recipeStream ??= _recipeDao.watchAllRecipes();
     return recipeStream!;
   }
 
+  /// Provide streams to observe changes in ingredients.
   @override
   Stream<List<Ingredient>> watchAllIngredients() {
     if (ingredientStream == null) {

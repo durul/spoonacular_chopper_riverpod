@@ -8,6 +8,7 @@ import 'package:path_provider/path_provider.dart';
 import '../utils/logger.dart';
 import 'database/recipe_db.dart';
 
+/// Sets up a SQLite database with encryption using Drift and SQLCipher.
 RecipeDatabase openRecipeDatabase(String dbKey) {
   return RecipeDatabase(LazyDatabase(() async {
     final dbFolder = await getApplicationDocumentsDirectory();
@@ -22,7 +23,7 @@ RecipeDatabase openRecipeDatabase(String dbKey) {
         if (result.isEmpty) {
           throw UnsupportedError(
             'This database needs to run with SQLCipher, but that library is '
-                'not available!',
+            'not available!',
           );
         }
 

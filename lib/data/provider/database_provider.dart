@@ -13,8 +13,8 @@ import '../database/recipe_db.dart';
 import '../native.dart';
 import '../secure_storage.dart';
 
-/// DatabaseProvider is a singleton class that manages database connections and
-/// provides access to DAOs.
+/// DatabaseProvider is a singleton class that manages he `RecipeDatabase`
+/// connections and provides access to DAOs.
 class DatabaseProvider {
   DatabaseProvider._(this._secureStorage);
 
@@ -22,6 +22,8 @@ class DatabaseProvider {
   late IngredientDao _ingredientDao;
   late final RecipeDatabase _recipeDatabase;
 
+  // SecureStorage for storing the database encryption key.
+  // Implements SQLCipher for database encryption on supported platforms.
   final SecureStorage _secureStorage;
 
   static const kDbKey = 'db_key';
@@ -69,6 +71,9 @@ class DatabaseProvider {
 
   Future<void> _initDatabase() async {
     await _loadSecureStorageLibrary();
+
+    // This method either retrieves an existing encryption key from
+    // secure storage or generates a new one if it doesn't exist.
     final dbKey = await _getOrCreateDbKey();
 
     try {
@@ -81,6 +86,8 @@ class DatabaseProvider {
       }
     }
 
+    // This line configures Drift to not warn about multiple database
+    // instances, which can be useful in certain scenarios.
     driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
 
     _recipeDao = _recipeDatabase.recipeDao;
@@ -150,7 +157,7 @@ class DatabaseProvider {
     }
   }
 
-  // Generates a new encryption key if one does not exist.
+  /// Generates a new encryption key if one does not exist.
   Future<String> _getOrCreateDbKey() async {
     const kDbKey = 'db_key';
     var dbKey = await _secureStorage.read(kDbKey);

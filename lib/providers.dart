@@ -27,5 +27,6 @@ final appConfigProvider = NotifierProvider<AppConfigNotifier, AppConfig>(() {
   throw UnimplementedError('appConfigProvider must be overridden before use');
 });
 
+// It manages asynchronous state.
 final repositoryProvider =
     AsyncNotifierProvider<DBRepository, CurrentRecipeData>(DBRepository.new);
