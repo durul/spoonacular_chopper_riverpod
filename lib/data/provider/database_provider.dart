@@ -1,7 +1,5 @@
-import 'dart:convert';
 import 'dart:ffi';
 import 'dart:io';
-import 'dart:math';
 
 import 'package:drift/drift.dart';
 import 'package:path/path.dart';
@@ -10,13 +8,31 @@ import 'package:sqlite3/open.dart';
 import 'package:sqlite3/sqlite3.dart';
 
 import '../../../utils/logger.dart';
+import '../../utils/uid_gen.dart';
 import '../database/recipe_db.dart';
 import '../native.dart';
 import '../secure_storage.dart';
 
+/// DatabaseProvider is a singleton class that manages database connections and
+/// provides access to DAOs.
 class DatabaseProvider {
   DatabaseProvider._(this._secureStorage);
 
+  late RecipeDao _recipeDao;
+  late IngredientDao _ingredientDao;
+  late final RecipeDatabase _recipeDatabase;
+
+  final SecureStorage _secureStorage;
+
+  static const kDbKey = 'db_key';
+
+  RecipeDao get recipeDao => _recipeDao;
+
+  IngredientDao get ingredientDao => _ingredientDao;
+
+  RecipeDatabase get recipeDatabase => _recipeDatabase;
+
+  /// Creates an instance and initializes the database.
   static Future<DatabaseProvider> initialize(
       SecureStorage secureStorage) async {
     final provider = DatabaseProvider._(secureStorage);
@@ -24,6 +40,7 @@ class DatabaseProvider {
     return provider;
   }
 
+  /// Checks if the database connection is successful.
   Future<void> testDatabaseConnection() async {
     try {
       await _recipeDatabase.customSelect('SELECT 1').getSingle();
@@ -36,6 +53,7 @@ class DatabaseProvider {
     }
   }
 
+  /// Checks if the database is encrypted.
   Future<void> testDatabaseEncryption() async {
     final dbFile = File(join(await getDatabasesPath(), 'db.sqlite'));
     if (await dbFile.exists()) {
@@ -69,20 +87,7 @@ class DatabaseProvider {
     _ingredientDao = _recipeDatabase.ingredientDao;
   }
 
-  late RecipeDao _recipeDao;
-  late IngredientDao _ingredientDao;
-  late final RecipeDatabase _recipeDatabase;
-
-  final SecureStorage _secureStorage;
-
-  static const kDbKey = 'db_key';
-
-  RecipeDao get recipeDao => _recipeDao;
-
-  IngredientDao get ingredientDao => _ingredientDao;
-
-  RecipeDatabase get recipeDatabase => _recipeDatabase;
-
+  /// Loads the appropriate SQLite library based on the platform.
   Future<void> _loadSecureStorageLibrary() async {
     if (Platform.isIOS || Platform.isAndroid) {
       await loadSqlite3Flutter();
@@ -93,6 +98,7 @@ class DatabaseProvider {
     }
   }
 
+  /// Loads the SQLite library for the platform.
   Future<void> loadSqlite3Flutter() async {
     if (Platform.isIOS) {
       return _openOnIOS();
@@ -103,6 +109,7 @@ class DatabaseProvider {
     }
   }
 
+  /// Opens the SQLite library on iOS.
   Future<void> _openOnIOS() async {
     try {
       open.overrideFor(OperatingSystem.iOS, () => DynamicLibrary.executable());
@@ -111,6 +118,7 @@ class DatabaseProvider {
     }
   }
 
+  /// Opens the SQLite library on Android.
   Future<void> _openOnAndroid() async {
     try {
       open.overrideFor(OperatingSystem.android,
@@ -120,6 +128,7 @@ class DatabaseProvider {
     }
   }
 
+  /// Opens the SQLite library on Linux.
   void _openOnLinux() {
     try {
       open.overrideFor(
@@ -141,19 +150,14 @@ class DatabaseProvider {
     }
   }
 
+  // Generates a new encryption key if one does not exist.
   Future<String> _getOrCreateDbKey() async {
     const kDbKey = 'db_key';
     var dbKey = await _secureStorage.read(kDbKey);
     if (dbKey == null) {
-      dbKey = generateStrongEncryptionKey();
+      dbKey = UidGen.generateStrongEncryptionKey();
       await _secureStorage.write(kDbKey, dbKey);
     }
     return dbKey;
-  }
-
-  String generateStrongEncryptionKey() {
-    final random = Random.secure();
-    final values = List<int>.generate(32, (i) => random.nextInt(256));
-    return base64Url.encode(values);
   }
 }

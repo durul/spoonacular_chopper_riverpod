@@ -7,7 +7,7 @@ class UidGen {
   ///
   /// Generate random string
   ///
-  static String generate() {
+  static String generateStrongEncryptionKey() {
     final random = Random(DateTime.now().millisecond);
 
     const hexDigits = '0123456789abcdef';
