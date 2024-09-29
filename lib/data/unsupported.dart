@@ -8,9 +8,9 @@ Never _unsupported() {
 }
 
 // Depending on the platform the app is compiled to, the following stubs will
-// be replaced with the methods in native.dart or web.dart
+// be replaced with the methods in native_db.dart or web_db.dart
 RecipeDatabase openRecipeDatabase(String dbKey) {
-  _unsupported();
+  throw UnsupportedError('No database implementation found.');
 }
 
 Future<void> validateDatabaseSchema(GeneratedDatabase database) async {

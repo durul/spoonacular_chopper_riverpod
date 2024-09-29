@@ -1,16 +1,14 @@
-import 'dart:ffi';
 import 'dart:io';
 
 import 'package:drift/drift.dart';
 import 'package:path/path.dart';
 import 'package:sqlbrite/sqlbrite.dart';
-import 'package:sqlite3/open.dart';
 import 'package:sqlite3/sqlite3.dart';
 
 import '../../../utils/logger.dart';
 import '../../utils/uid_gen.dart';
+import '../connection.dart' as connection;
 import '../database/recipe_db.dart';
-import '../native.dart';
 import '../secure_storage.dart';
 
 /// DatabaseProvider is a singleton class that manages he `RecipeDatabase`
@@ -70,15 +68,13 @@ class DatabaseProvider {
   }
 
   Future<void> _initDatabase() async {
-    await _loadSecureStorageLibrary();
-
     // This method either retrieves an existing encryption key from
     // secure storage or generates a new one if it doesn't exist.
     final dbKey = await _getOrCreateDbKey();
 
     try {
       /// Open the database
-      _recipeDatabase = openRecipeDatabase(dbKey);
+      _recipeDatabase = connection.openRecipeDatabase(dbKey);
     } catch (e) {
       logInfo('Error connecting to database: $e');
       if (e.toString().contains('file is encrypted or is not a database')) {
@@ -92,69 +88,6 @@ class DatabaseProvider {
 
     _recipeDao = _recipeDatabase.recipeDao;
     _ingredientDao = _recipeDatabase.ingredientDao;
-  }
-
-  /// Loads the appropriate SQLite library based on the platform.
-  Future<void> _loadSecureStorageLibrary() async {
-    if (Platform.isIOS || Platform.isAndroid) {
-      await loadSqlite3Flutter();
-    } else if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
-      sqlite3.openInMemory();
-    } else {
-      throw UnsupportedError('Unsupported platform');
-    }
-  }
-
-  /// Loads the SQLite library for the platform.
-  Future<void> loadSqlite3Flutter() async {
-    if (Platform.isIOS) {
-      return _openOnIOS();
-    } else if (Platform.isAndroid) {
-      return _openOnAndroid();
-    } else if (Platform.isLinux) {
-      return _openOnLinux();
-    }
-  }
-
-  /// Opens the SQLite library on iOS.
-  Future<void> _openOnIOS() async {
-    try {
-      open.overrideFor(OperatingSystem.iOS, () => DynamicLibrary.executable());
-    } catch (error) {
-      logErrorText(error.toString());
-    }
-  }
-
-  /// Opens the SQLite library on Android.
-  Future<void> _openOnAndroid() async {
-    try {
-      open.overrideFor(OperatingSystem.android,
-          () => DynamicLibrary.open('libsqlcipher.so'));
-    } catch (error) {
-      logErrorText(error.toString());
-    }
-  }
-
-  /// Opens the SQLite library on Linux.
-  void _openOnLinux() {
-    try {
-      open.overrideFor(
-          OperatingSystem.linux, () => DynamicLibrary.open('libsqlcipher.so'));
-      return;
-    } catch (_) {
-      logErrorText(_.toString());
-      try {
-        // fallback to sqlite if unavailable
-        final scriptDir = File(Platform.script.toFilePath()).parent;
-        final libraryNextToScript = File('${scriptDir.path}/sqlite3.so');
-        final lib = DynamicLibrary.open(libraryNextToScript.path);
-
-        open.overrideFor(OperatingSystem.linux, () => lib);
-      } catch (error) {
-        logErrorText(error.toString());
-        rethrow;
-      }
-    }
   }
 
   /// Generates a new encryption key if one does not exist.
