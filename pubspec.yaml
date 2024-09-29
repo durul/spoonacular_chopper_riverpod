@@ -38,11 +38,11 @@ dependencies:
   flutter_riverpod: ^2.5.1
 
   # Database and ORM dependencies
-  synchronized: ^3.3.0+2
+  synchronized: ^3.3.0+3
   sqlbrite: ^2.8.0
   sqlite3: ^2.4.6
   web_ffi: ^0.7.2
-  drift: ^2.20.2
+  drift: ^2.20.3
 
   # local storage
   drift_sqflite: ^2.0.1

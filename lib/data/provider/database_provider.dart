@@ -1,10 +1,5 @@
-import 'dart:io';
 
 import 'package:drift/drift.dart';
-import 'package:path/path.dart';
-import 'package:sqlbrite/sqlbrite.dart';
-import 'package:sqlite3/sqlite3.dart';
-
 import '../../../utils/logger.dart';
 import '../../utils/uid_gen.dart';
 import '../connection.dart' as connection;
@@ -40,32 +35,32 @@ class DatabaseProvider {
     return provider;
   }
 
-  /// Checks if the database connection is successful.
-  Future<void> testDatabaseConnection() async {
-    try {
-      await _recipeDatabase.customSelect('SELECT 1').getSingle();
-      logInfo('Database connection successful');
-    } catch (e) {
-      logInfo('Database connection failed');
-      if (e is SqliteException && e.extendedResultCode == 26) {
-        logInfo('Encryption key might be incorrect');
-      }
-    }
-  }
-
-  /// Checks if the database is encrypted.
-  Future<void> testDatabaseEncryption() async {
-    final dbFile = File(join(await getDatabasesPath(), 'db.sqlite'));
-    if (await dbFile.exists()) {
-      final bytes = await dbFile.readAsBytes();
-      final header = bytes.sublist(0, 16);
-      final isEncrypted =
-          !header.any((byte) => byte == 0x53 && byte == 0x51 && byte == 0x4C);
-      logInfo('Database is ${isEncrypted ? 'encrypted' : 'not encrypted'}');
-    } else {
-      logInfo('Database file does not exist');
-    }
-  }
+  // /// Checks if the database connection is successful.
+  // Future<void> testDatabaseConnection() async {
+  //   try {
+  //     await _recipeDatabase.customSelect('SELECT 1').getSingle();
+  //     logInfo('Database connection successful');
+  //   } catch (e) {
+  //     logInfo('Database connection failed');
+  //     if (e is SqliteException && e.extendedResultCode == 26) {
+  //       logInfo('Encryption key might be incorrect');
+  //     }
+  //   }
+  // }
+  //
+  // /// Checks if the database is encrypted.
+  // Future<void> testDatabaseEncryption() async {
+  //   final dbFile = File(join(await getDatabasesPath(), 'db.sqlite'));
+  //   if (await dbFile.exists()) {
+  //     final bytes = await dbFile.readAsBytes();
+  //     final header = bytes.sublist(0, 16);
+  //     final isEncrypted =
+  //         !header.any((byte) => byte == 0x53 && byte == 0x51 && byte == 0x4C);
+  //     logInfo('Database is ${isEncrypted ? 'encrypted' : 'not encrypted'}');
+  //   } else {
+  //     logInfo('Database file does not exist');
+  //   }
+  // }
 
   Future<void> _initDatabase() async {
     // This method either retrieves an existing encryption key from

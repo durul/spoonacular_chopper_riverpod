@@ -43,9 +43,9 @@ Future<void> main(List<String> args,
   final repository = DBRepository();
   await repository.init();
 
-  final databaseProvider = await DatabaseProvider.initialize(SecureStorage());
-  await databaseProvider.testDatabaseConnection();
-  await databaseProvider.testDatabaseEncryption();
+  await DatabaseProvider.initialize(SecureStorage());
+  //await databaseProvider.testDatabaseConnection();
+  // await databaseProvider.testDatabaseEncryption();
 
   // ProviderContainer allows me to read providers outside of the widget tree.
   final container = ProviderContainer(
