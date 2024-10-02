@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:chopper/chopper.dart';
 
+import '../config.dart';
 import '../data/models/recipe.dart';
 import 'model_response.dart';
 import 'query_result.dart';
@@ -9,8 +10,6 @@ import 'service_interface.dart';
 import 'spoonacular_converter.dart';
 
 part 'spoonacular_service.chopper.dart';
-
-const String apiKey = '88c799c7f58e4c389f876e7bc8833e53';
 
 /// A Chopper service for the Spoonacular API.
 /// It is a generic interface to make network calls.
