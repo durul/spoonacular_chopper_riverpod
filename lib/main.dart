@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logging/logging.dart' as system_log;
 import 'package:lumberdash/lumberdash.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'application.dart';
@@ -17,6 +18,19 @@ import 'utils.dart';
 
 Future<void> main(List<String> args,
     {List<Override>? externalOverrides}) async {
+  PackageInfo packageInfo = await PackageInfo.fromPlatform();
+
+  String appName = packageInfo.appName;
+  String packageName = packageInfo.packageName;
+  String version = packageInfo.version;
+  String buildNumber = packageInfo.buildNumber;
+
+  print('appName: $appName');
+  print('packageName: $packageName');
+  print('version: $version');
+  print('buildNumber: $buildNumber');
+  
+
   // This initializes the logging package and allows Chopper to log
   // requests and responses.
   _setupLogging();
