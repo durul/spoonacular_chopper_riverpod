@@ -3,10 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:in_app_review/in_app_review.dart';
 
 import '../../data/models/recipe.dart';
 import '../../providers.dart';
 import '../recipes/recipe_details.dart';
+import 'in_app_alert_dialog.dart';
 
 class Bookmarks extends ConsumerStatefulWidget {
   const Bookmarks({super.key});
@@ -18,6 +20,7 @@ class Bookmarks extends ConsumerStatefulWidget {
 class _BookmarkState extends ConsumerState<Bookmarks> {
   List<Recipe> recipes = [];
   late Stream<List<Recipe>> recipeStream;
+  final InAppReview _inAppReview = InAppReview.instance;
 
   @override
   void initState() {
@@ -26,6 +29,29 @@ class _BookmarkState extends ConsumerState<Bookmarks> {
     // This watches the repository for changes and updates the widget
     final repository = ref.read(repositoryProvider.notifier);
     recipeStream = repository.watchAllRecipes();
+  }
+
+  void _openAppStoreReview() async {
+    if (await _inAppReview.isAvailable()) {
+      // Open the store review page
+      _inAppReview.openStoreListing(
+        appStoreId: 'XXXXXX', // Replace with your app store ID
+      );    } else {
+      // If the store review is not available, I can prompt the user to rate your app on the app store.
+      // For example, you can launch the Play Store or App Store URL based on the platform.
+      // Here, we will show a dialog for demonstration purposes.
+      _showRatingDialog();
+    }
+  }
+
+  void _showRatingDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return InAppAlertDialog();
+      },
+    );
   }
 
   @override
@@ -44,6 +70,9 @@ class _BookmarkState extends ConsumerState<Bookmarks> {
       builder: (context, AsyncSnapshot<List<Recipe>> snapshot) {
         if (snapshot.connectionState == ConnectionState.active) {
           recipes = snapshot.data ?? [];
+          if (recipes.length >= 5) {
+            _openAppStoreReview();
+          }
         }
         return SliverLayoutBuilder(
           builder: (BuildContext context, SliverConstraints constraints) {
