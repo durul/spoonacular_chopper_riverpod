@@ -18,18 +18,18 @@ import 'utils.dart';
 
 Future<void> main(List<String> args,
     {List<Override>? externalOverrides}) async {
-  PackageInfo packageInfo = await PackageInfo.fromPlatform();
+  final packageInfo = await PackageInfo.fromPlatform();
 
-  String appName = packageInfo.appName;
-  String packageName = packageInfo.packageName;
-  String version = packageInfo.version;
-  String buildNumber = packageInfo.buildNumber;
+  final appName = packageInfo.appName;
+  final packageName = packageInfo.packageName;
+  final version = packageInfo.version;
+  final buildNumber = packageInfo.buildNumber;
 
   print('appName: $appName');
   print('packageName: $packageName');
   print('version: $version');
   print('buildNumber: $buildNumber');
-  
+
 
   // This initializes the logging package and allows Chopper to log
   // requests and responses.
