@@ -28,7 +28,8 @@ dependencies:
   flutter_html: ^3.0.0-beta.2
   lumberdash: ^3.0.0
   colorize_lumberdash: ^3.0.0
-  package_info_plus: ^8.0.2
+  package_info_plus: ^8.0.3
+  fluttertoast: ^8.2.8
 
   # Networking dependencies
   http: ^1.2.2
@@ -36,7 +37,7 @@ dependencies:
 
   # state management
   path_provider: ^2.1.4
-  flutter_riverpod: ^2.5.1
+  flutter_riverpod: ^2.5.3
 
   # Database and ORM dependencies
   synchronized: ^3.3.0+3
@@ -62,6 +63,8 @@ dependencies:
   riverpod_lint: ^2.3.13
   in_app_review: 2.0.9
 
+  # check connection
+  connectivity_plus: ^6.0.5
 
 dev_dependencies:
   flutter_test:

@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_adaptive_scaffold/flutter_adaptive_scaffold.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 import '../providers.dart';
 import '../utils.dart';
+import '../utils/network_info.dart';
 import 'groceries/groceries.dart';
 import 'recipes/recipe_list.dart';
 import 'theme/colors.dart';
@@ -55,6 +57,45 @@ class _MainScreenState extends ConsumerState<MainScreen> {
   @override
   Widget build(BuildContext context) {
     final appConfig = ref.watch(appConfigProvider);
+    final connectivityStream = ref.watch(connectivityStreamProvider);
+
+    // This line retrieves a stream from connectivityStreamProvider,
+    // which continuously emits connectivity status updates over time.
+    connectivityStream.when(
+      data: (isConnected) {
+        if (!isConnected) {
+          Fluttertoast.showToast(
+            msg: 'No internet connection',
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.TOP,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+            fontSize: 16.0,
+          );
+        } else {
+          // Show toast when connection is back online
+          Fluttertoast.showToast(
+            msg: 'Back online',
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.TOP,
+            backgroundColor: Colors.green,
+            textColor: Colors.white,
+            fontSize: 16.0,
+          );
+        }
+      },
+      loading: () {},
+      error: (error, stack) {
+        Fluttertoast.showToast(
+          msg: 'Error checking connection',
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.TOP,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: 16.0,
+        );
+      },
+    );
 
     if (isDesktop() || isWeb()) {
       return largeLayout();

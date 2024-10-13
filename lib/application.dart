@@ -4,8 +4,10 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'providers.dart';
+import 'ui/connection_status/no_internet_screen.dart';
 import 'ui/main_screen.dart';
 import 'ui/theme/theme.dart';
+import 'utils/network_info.dart';
 import 'utils/logger.dart';
 
 class Application extends ConsumerStatefulWidget {
@@ -19,25 +21,13 @@ class _MyAppState extends ConsumerState<Application> {
   ThemeMode currentMode = ThemeMode.light;
   late final AppLifecycleListener _lifecycleListener;
   late AppLifecycleState? _currentState;
-
-  // MaterialColor? appConfigColor(AppConfig appConfig) {
-  //   switch (appConfig.flavor) {
-  //     case 'integration':
-  //       return Colors.red;
-  //     case 'qa':
-  //       return Colors.green;
-  //     case 'production':
-  //       return Colors.brown;
-  //     case 'staging':
-  //       return Colors.blue;
-  //   }
-  //   return null;
-  // }
+  bool? _initialConnectionStatus;
 
   @override
   void initState() {
     super.initState();
     _currentState = SchedulerBinding.instance.lifecycleState;
+    _checkInitialConnection();
 
     _lifecycleListener = AppLifecycleListener(
       onShow: () => _handleState('show'),
@@ -49,6 +39,12 @@ class _MyAppState extends ConsumerState<Application> {
       onRestart: () => _handleState('restart'),
       onStateChange: _handleStateChange,
     );
+  }
+
+  Future<void> _checkInitialConnection() async {
+    final connectionStatus = ref.read(networkInfoProvider);
+    _initialConnectionStatus = await connectionStatus.isConnected();
+    setState(() {});
   }
 
   void _handleState(String state) {
@@ -73,7 +69,8 @@ class _MyAppState extends ConsumerState<Application> {
   @override
   Widget build(BuildContext context) {
     final appConfig = ref.watch(appConfigProvider);
-    // Add this line to use _currentState
+    final connectivityStream = ref.watch(connectivityStreamProvider);
+
     logInfo('Current app lifecycle state: $_currentState');
 
     return PlatformMenuBar(
@@ -111,7 +108,19 @@ class _MyAppState extends ConsumerState<Application> {
         themeMode: currentMode,
         theme: ThemeData(useMaterial3: true, colorScheme: lightColorScheme),
         darkTheme: ThemeData(useMaterial3: true, colorScheme: darkColorScheme),
-        home: const MainScreen(),
+        home: _initialConnectionStatus == null
+            ? const CircularProgressIndicator()
+            : _initialConnectionStatus!
+                ? const MainScreen()
+                : connectivityStream.when(
+                    data: (isConnected) {
+                      return isConnected
+                          ? const MainScreen()
+                          : const NoInternetScreen();
+                    },
+                    loading: () => const CircularProgressIndicator(),
+                    error: (_, __) => const Text('Error checking connection'),
+                  ),
       ),
     );
   }
