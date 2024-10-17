@@ -5,11 +5,13 @@ import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:lumberdash/lumberdash.dart';
-import '../../network/service_interface.dart';
-import '../../providers.dart';
+import 'package:vader_popup/popup_dialog.dart';
+import 'package:vader_popup/popup_dialog_message.dart';
 
 import '../../data/models/recipe.dart';
 import '../../network/model_response.dart';
+import '../../network/service_interface.dart';
+import '../../providers.dart';
 import '../theme/colors.dart';
 import '../widgets/common.dart';
 
@@ -27,6 +29,7 @@ class RecipeDetails extends ConsumerStatefulWidget {
 
 class _RecipeDetailsState extends ConsumerState<RecipeDetails> {
   Recipe? recipeDetail;
+  final dialog = PopupDialog();
 
   @override
   void initState() {
@@ -160,16 +163,18 @@ class _RecipeDetailsState extends ConsumerState<RecipeDetails> {
                     : 'assets/images/icon_bookmark.svg',
                 colorFilter: ColorFilter.mode(titleRowColor, BlendMode.srcIn),
               ),
-              onPressed: () {
+              onPressed: () async {
+                var result = -1;
                 if (!widget.recipe.bookmarked) {
                   if (recipeDetail != null) {
-                    repository.insertRecipe(recipeDetail!);
+                    result = await repository.insertRecipe(recipeDetail!);
                   }
-                  // ignore: dead_code
                 } else {
                   repository.deleteRecipe(recipeDetail!);
                 }
-                Navigator.pop(context);
+                if (mounted) {
+                  await showResultPopUp(result > 0);
+                }
               },
             ),
             sizedW8,
@@ -177,6 +182,32 @@ class _RecipeDetailsState extends ConsumerState<RecipeDetails> {
         ),
       ),
     );
+  }
+
+  Future<void> showResultPopUp(bool success) async {
+    if (!mounted) return; // Check if the widget is still in the tree
+
+    if (success) {
+      await dialog.success(
+        context: context,
+        title: 'Success',
+        message: widget.recipe.bookmarked
+            ? 'Recipe removed from bookmarks successfully.'
+            : 'Recipe added to bookmarks successfully.',
+      );
+      // Update the state after the dialog is dismissed
+      if (mounted) {
+        setState(() {
+          Navigator.pop(context);
+        });
+      }
+    } else {
+      await dialog.error(
+        context: context,
+        title: 'Error',
+        message: 'Failed to update bookmarks. Please try again.',
+      );
+    }
   }
 
   Widget description() {
