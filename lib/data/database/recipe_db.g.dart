@@ -597,61 +597,78 @@ typedef $$DbRecipeTableUpdateCompanionBuilder = DbRecipeCompanion Function({
 });
 
 class $$DbRecipeTableFilterComposer
-    extends FilterComposer<_$RecipeDatabase, $DbRecipeTable> {
-  $$DbRecipeTableFilterComposer(super.$state);
-  ColumnFilters<int> get id => $state.composableBuilder(
-      column: $state.table.id,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
+    extends Composer<_$RecipeDatabase, $DbRecipeTable> {
+  $$DbRecipeTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get label => $state.composableBuilder(
-      column: $state.table.label,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
+  ColumnFilters<String> get label => $composableBuilder(
+      column: $table.label, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get image => $state.composableBuilder(
-      column: $state.table.image,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
+  ColumnFilters<String> get image => $composableBuilder(
+      column: $table.image, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get description => $state.composableBuilder(
-      column: $state.table.description,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
+  ColumnFilters<String> get description => $composableBuilder(
+      column: $table.description, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<bool> get bookmarked => $state.composableBuilder(
-      column: $state.table.bookmarked,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
+  ColumnFilters<bool> get bookmarked => $composableBuilder(
+      column: $table.bookmarked, builder: (column) => ColumnFilters(column));
 }
 
 class $$DbRecipeTableOrderingComposer
-    extends OrderingComposer<_$RecipeDatabase, $DbRecipeTable> {
-  $$DbRecipeTableOrderingComposer(super.$state);
-  ColumnOrderings<int> get id => $state.composableBuilder(
-      column: $state.table.id,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
+    extends Composer<_$RecipeDatabase, $DbRecipeTable> {
+  $$DbRecipeTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get label => $state.composableBuilder(
-      column: $state.table.label,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
+  ColumnOrderings<String> get label => $composableBuilder(
+      column: $table.label, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get image => $state.composableBuilder(
-      column: $state.table.image,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
+  ColumnOrderings<String> get image => $composableBuilder(
+      column: $table.image, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get description => $state.composableBuilder(
-      column: $state.table.description,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
+  ColumnOrderings<String> get description => $composableBuilder(
+      column: $table.description, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<bool> get bookmarked => $state.composableBuilder(
-      column: $state.table.bookmarked,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
+  ColumnOrderings<bool> get bookmarked => $composableBuilder(
+      column: $table.bookmarked, builder: (column) => ColumnOrderings(column));
+}
+
+class $$DbRecipeTableAnnotationComposer
+    extends Composer<_$RecipeDatabase, $DbRecipeTable> {
+  $$DbRecipeTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get label =>
+      $composableBuilder(column: $table.label, builder: (column) => column);
+
+  GeneratedColumn<String> get image =>
+      $composableBuilder(column: $table.image, builder: (column) => column);
+
+  GeneratedColumn<String> get description => $composableBuilder(
+      column: $table.description, builder: (column) => column);
+
+  GeneratedColumn<bool> get bookmarked => $composableBuilder(
+      column: $table.bookmarked, builder: (column) => column);
 }
 
 class $$DbRecipeTableTableManager extends RootTableManager<
@@ -660,6 +677,7 @@ class $$DbRecipeTableTableManager extends RootTableManager<
     DbRecipeData,
     $$DbRecipeTableFilterComposer,
     $$DbRecipeTableOrderingComposer,
+    $$DbRecipeTableAnnotationComposer,
     $$DbRecipeTableCreateCompanionBuilder,
     $$DbRecipeTableUpdateCompanionBuilder,
     (
@@ -672,10 +690,12 @@ class $$DbRecipeTableTableManager extends RootTableManager<
       : super(TableManagerState(
           db: db,
           table: table,
-          filteringComposer:
-              $$DbRecipeTableFilterComposer(ComposerState(db, table)),
-          orderingComposer:
-              $$DbRecipeTableOrderingComposer(ComposerState(db, table)),
+          createFilteringComposer: () =>
+              $$DbRecipeTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$DbRecipeTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$DbRecipeTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback: ({
             Value<int> id = const Value.absent(),
             Value<String> label = const Value.absent(),
@@ -717,6 +737,7 @@ typedef $$DbRecipeTableProcessedTableManager = ProcessedTableManager<
     DbRecipeData,
     $$DbRecipeTableFilterComposer,
     $$DbRecipeTableOrderingComposer,
+    $$DbRecipeTableAnnotationComposer,
     $$DbRecipeTableCreateCompanionBuilder,
     $$DbRecipeTableUpdateCompanionBuilder,
     (
@@ -741,51 +762,69 @@ typedef $$DbIngredientTableUpdateCompanionBuilder = DbIngredientCompanion
 });
 
 class $$DbIngredientTableFilterComposer
-    extends FilterComposer<_$RecipeDatabase, $DbIngredientTable> {
-  $$DbIngredientTableFilterComposer(super.$state);
-  ColumnFilters<int> get id => $state.composableBuilder(
-      column: $state.table.id,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
+    extends Composer<_$RecipeDatabase, $DbIngredientTable> {
+  $$DbIngredientTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<int> get recipeId => $state.composableBuilder(
-      column: $state.table.recipeId,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
+  ColumnFilters<int> get recipeId => $composableBuilder(
+      column: $table.recipeId, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get name => $state.composableBuilder(
-      column: $state.table.name,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
+  ColumnFilters<String> get name => $composableBuilder(
+      column: $table.name, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<double> get amount => $state.composableBuilder(
-      column: $state.table.amount,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
+  ColumnFilters<double> get amount => $composableBuilder(
+      column: $table.amount, builder: (column) => ColumnFilters(column));
 }
 
 class $$DbIngredientTableOrderingComposer
-    extends OrderingComposer<_$RecipeDatabase, $DbIngredientTable> {
-  $$DbIngredientTableOrderingComposer(super.$state);
-  ColumnOrderings<int> get id => $state.composableBuilder(
-      column: $state.table.id,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
+    extends Composer<_$RecipeDatabase, $DbIngredientTable> {
+  $$DbIngredientTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<int> get recipeId => $state.composableBuilder(
-      column: $state.table.recipeId,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
+  ColumnOrderings<int> get recipeId => $composableBuilder(
+      column: $table.recipeId, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get name => $state.composableBuilder(
-      column: $state.table.name,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
+  ColumnOrderings<String> get name => $composableBuilder(
+      column: $table.name, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<double> get amount => $state.composableBuilder(
-      column: $state.table.amount,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
+  ColumnOrderings<double> get amount => $composableBuilder(
+      column: $table.amount, builder: (column) => ColumnOrderings(column));
+}
+
+class $$DbIngredientTableAnnotationComposer
+    extends Composer<_$RecipeDatabase, $DbIngredientTable> {
+  $$DbIngredientTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get recipeId =>
+      $composableBuilder(column: $table.recipeId, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<double> get amount =>
+      $composableBuilder(column: $table.amount, builder: (column) => column);
 }
 
 class $$DbIngredientTableTableManager extends RootTableManager<
@@ -794,6 +833,7 @@ class $$DbIngredientTableTableManager extends RootTableManager<
     DbIngredientData,
     $$DbIngredientTableFilterComposer,
     $$DbIngredientTableOrderingComposer,
+    $$DbIngredientTableAnnotationComposer,
     $$DbIngredientTableCreateCompanionBuilder,
     $$DbIngredientTableUpdateCompanionBuilder,
     (
@@ -806,10 +846,12 @@ class $$DbIngredientTableTableManager extends RootTableManager<
       : super(TableManagerState(
           db: db,
           table: table,
-          filteringComposer:
-              $$DbIngredientTableFilterComposer(ComposerState(db, table)),
-          orderingComposer:
-              $$DbIngredientTableOrderingComposer(ComposerState(db, table)),
+          createFilteringComposer: () =>
+              $$DbIngredientTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$DbIngredientTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$DbIngredientTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback: ({
             Value<int> id = const Value.absent(),
             Value<int> recipeId = const Value.absent(),
@@ -847,6 +889,7 @@ typedef $$DbIngredientTableProcessedTableManager = ProcessedTableManager<
     DbIngredientData,
     $$DbIngredientTableFilterComposer,
     $$DbIngredientTableOrderingComposer,
+    $$DbIngredientTableAnnotationComposer,
     $$DbIngredientTableCreateCompanionBuilder,
     $$DbIngredientTableUpdateCompanionBuilder,
     (
