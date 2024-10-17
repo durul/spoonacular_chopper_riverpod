@@ -21,6 +21,7 @@ class MainScreen extends ConsumerStatefulWidget {
 class _MainScreenState extends ConsumerState<MainScreen> {
   List<Widget> pageList = <Widget>[];
   static const String prefSelectedIndexKey = 'selectedIndex';
+  bool? _previousConnectionState;
 
   @override
   void initState() {
@@ -63,26 +64,29 @@ class _MainScreenState extends ConsumerState<MainScreen> {
     // which continuously emits connectivity status updates over time.
     connectivityStream.when(
       data: (isConnected) {
-        if (!isConnected) {
-          Fluttertoast.showToast(
-            msg: 'No internet connection',
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.TOP,
-            backgroundColor: Colors.red,
-            textColor: Colors.white,
-            fontSize: 16.0,
-          );
-        } else {
-          // Show toast when connection is back online
-          Fluttertoast.showToast(
-            msg: 'Back online',
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.TOP,
-            backgroundColor: Colors.green,
-            textColor: Colors.white,
-            fontSize: 16.0,
-          );
+        if (_previousConnectionState != null) {
+          if (!isConnected) {
+            Fluttertoast.showToast(
+              msg: 'No internet connection',
+              toastLength: Toast.LENGTH_SHORT,
+              gravity: ToastGravity.TOP,
+              backgroundColor: Colors.red,
+              textColor: Colors.white,
+              fontSize: 16.0,
+            );
+          } else if (!_previousConnectionState! && isConnected) {
+            // Show toast only when connection is restored
+            Fluttertoast.showToast(
+              msg: 'Back online',
+              toastLength: Toast.LENGTH_SHORT,
+              gravity: ToastGravity.TOP,
+              backgroundColor: Colors.green,
+              textColor: Colors.white,
+              fontSize: 16.0,
+            );
+          }
         }
+        _previousConnectionState = isConnected;
       },
       loading: () {},
       error: (error, stack) {
